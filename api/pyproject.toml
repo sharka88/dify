@@ -72,7 +72,6 @@ ignore = [
 exclude = [
     "core/**/*.py",
     "controllers/**/*.py",
-    "models/**/*.py",
     "migrations/**/*",
 ]
 
