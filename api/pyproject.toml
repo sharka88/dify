@@ -70,7 +70,6 @@ ignore = [
 
 [tool.ruff.format]
 exclude = [
-    "core/**/*.py",
     "controllers/**/*.py",
     "models/**/*.py",
     "migrations/**/*",

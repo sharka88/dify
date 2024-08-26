@@ -31,10 +31,7 @@ from services.annotation_service import AppAnnotationService
 
 class MessageCycleManage:
     _application_generate_entity: Union[
-        ChatAppGenerateEntity,
-        CompletionAppGenerateEntity,
-        AgentChatAppGenerateEntity,
-        AdvancedChatAppGenerateEntity
+        ChatAppGenerateEntity, CompletionAppGenerateEntity, AgentChatAppGenerateEntity, AdvancedChatAppGenerateEntity
     ]
     _task_state: Union[EasyUITaskState, AdvancedChatTaskState]
 
@@ -47,15 +44,18 @@ class MessageCycleManage:
         """
         is_first_message = self._application_generate_entity.conversation_id is None
         extras = self._application_generate_entity.extras
-        auto_generate_conversation_name = extras.get('auto_generate_conversation_name', True)
+        auto_generate_conversation_name = extras.get("auto_generate_conversation_name", True)
 
         if auto_generate_conversation_name and is_first_message:
             # start generate thread
-            thread = Thread(target=self._generate_conversation_name_worker, kwargs={
-                'flask_app': current_app._get_current_object(),
-                'conversation_id': conversation.id,
-                'query': query
-            })
+            thread = Thread(
+                target=self._generate_conversation_name_worker,
+                kwargs={
+                    "flask_app": current_app._get_current_object(),
+                    "conversation_id": conversation.id,
+                    "query": query,
+                },
+            )
 
             thread.start()
 
@@ -63,17 +63,10 @@ class MessageCycleManage:
 
         return None
 
-    def _generate_conversation_name_worker(self,
-                                           flask_app: Flask,
-                                           conversation_id: str,
-                                           query: str):
+    def _generate_conversation_name_worker(self, flask_app: Flask, conversation_id: str, query: str):
         with flask_app.app_context():
             # get conversation and message
-            conversation = (
-                db.session.query(Conversation)
-                .filter(Conversation.id == conversation_id)
-                .first()
-            )
+            conversation = db.session.query(Conversation).filter(Conversation.id == conversation_id).first()
 
             if conversation.mode != AppMode.COMPLETION.value:
                 app_model = conversation.app
@@ -100,12 +93,9 @@ class MessageCycleManage:
         annotation = AppAnnotationService.get_annotation_by_id(event.message_annotation_id)
         if annotation:
             account = annotation.account
-            self._task_state.metadata['annotation_reply'] = {
-                'id': annotation.id,
-                'account': {
-                    'id': annotation.account_id,
-                    'name': account.name if account else 'Dify user'
-                }
+            self._task_state.metadata["annotation_reply"] = {
+                "id": annotation.id,
+                "account": {"id": annotation.account_id, "name": account.name if account else "Dify user"},
             }
 
             return annotation
@@ -119,7 +109,7 @@ class MessageCycleManage:
         :return:
         """
         if self._application_generate_entity.app_config.additional_features.show_retrieve_source:
-            self._task_state.metadata['retriever_resources'] = event.retriever_resources
+            self._task_state.metadata["retriever_resources"] = event.retriever_resources
 
     def _get_response_metadata(self) -> dict:
         """
@@ -129,16 +119,16 @@ class MessageCycleManage:
         metadata = {}
 
         # show_retrieve_source
-        if 'retriever_resources' in self._task_state.metadata:
-            metadata['retriever_resources'] = self._task_state.metadata['retriever_resources']
+        if "retriever_resources" in self._task_state.metadata:
+            metadata["retriever_resources"] = self._task_state.metadata["retriever_resources"]
 
         # show annotation reply
-        if 'annotation_reply' in self._task_state.metadata:
-            metadata['annotation_reply'] = self._task_state.metadata['annotation_reply']
+        if "annotation_reply" in self._task_state.metadata:
+            metadata["annotation_reply"] = self._task_state.metadata["annotation_reply"]
 
         # show usage
         if self._application_generate_entity.invoke_from in [InvokeFrom.DEBUGGER, InvokeFrom.SERVICE_API]:
-            metadata['usage'] = self._task_state.metadata['usage']
+            metadata["usage"] = self._task_state.metadata["usage"]
 
         return metadata
 
@@ -149,26 +139,24 @@ class MessageCycleManage:
         :return:
         """
         message_file: MessageFile = (
-            db.session.query(MessageFile)
-            .filter(MessageFile.id == event.message_file_id)
-            .first()
+            db.session.query(MessageFile).filter(MessageFile.id == event.message_file_id).first()
         )
 
         if message_file:
             # get tool file id
-            tool_file_id = message_file.url.split('/')[-1]
+            tool_file_id = message_file.url.split("/")[-1]
             # trim extension
-            tool_file_id = tool_file_id.split('.')[0]
+            tool_file_id = tool_file_id.split(".")[0]
 
             # get extension
-            if '.' in message_file.url:
+            if "." in message_file.url:
                 extension = f'.{message_file.url.split(".")[-1]}'
                 if len(extension) > 10:
-                    extension = '.bin'
+                    extension = ".bin"
             else:
-                extension = '.bin'
+                extension = ".bin"
             # add sign url to local file
-            if message_file.url.startswith('http'):
+            if message_file.url.startswith("http"):
                 url = message_file.url
             else:
                 url = ToolFileManager.sign_file(tool_file_id=tool_file_id, extension=extension)
@@ -177,8 +165,8 @@ class MessageCycleManage:
                 task_id=self._application_generate_entity.task_id,
                 id=message_file.id,
                 type=message_file.type,
-                belongs_to=message_file.belongs_to or 'user',
-                url=url
+                belongs_to=message_file.belongs_to or "user",
+                url=url,
             )
 
         return None
@@ -190,11 +178,7 @@ class MessageCycleManage:
         :param message_id: message id
         :return:
         """
-        return MessageStreamResponse(
-            task_id=self._application_generate_entity.task_id,
-            id=message_id,
-            answer=answer
-        )
+        return MessageStreamResponse(task_id=self._application_generate_entity.task_id, id=message_id, answer=answer)
 
     def _message_replace_to_stream_response(self, answer: str) -> MessageReplaceStreamResponse:
         """
@@ -202,7 +186,4 @@ class MessageCycleManage:
         :param answer: answer
         :return:
         """
-        return MessageReplaceStreamResponse(
-            task_id=self._application_generate_entity.task_id,
-            answer=answer
-        )
+        return MessageReplaceStreamResponse(task_id=self._application_generate_entity.task_id, answer=answer)

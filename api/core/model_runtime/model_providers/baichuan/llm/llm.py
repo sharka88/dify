@@ -33,19 +33,41 @@ from core.model_runtime.model_providers.baichuan.llm.baichuan_turbo_errors impor
 
 
 class BaichuanLarguageModel(LargeLanguageModel):
-    def _invoke(self, model: str, credentials: dict,
-                prompt_messages: list[PromptMessage], model_parameters: dict,
-                tools: list[PromptMessageTool] | None = None, stop: list[str] | None = None,
-                stream: bool = True, user: str | None = None) \
-            -> LLMResult | Generator:
-        return self._generate(model=model, credentials=credentials, prompt_messages=prompt_messages,
-                              model_parameters=model_parameters, tools=tools, stop=stop, stream=stream, user=user)
+    def _invoke(
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        model_parameters: dict,
+        tools: list[PromptMessageTool] | None = None,
+        stop: list[str] | None = None,
+        stream: bool = True,
+        user: str | None = None,
+    ) -> LLMResult | Generator:
+        return self._generate(
+            model=model,
+            credentials=credentials,
+            prompt_messages=prompt_messages,
+            model_parameters=model_parameters,
+            tools=tools,
+            stop=stop,
+            stream=stream,
+            user=user,
+        )
 
-    def get_num_tokens(self, model: str, credentials: dict, prompt_messages: list[PromptMessage],
-                       tools: list[PromptMessageTool] | None = None) -> int:
+    def get_num_tokens(
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        tools: list[PromptMessageTool] | None = None,
+    ) -> int:
         return self._num_tokens_from_messages(prompt_messages)
 
-    def _num_tokens_from_messages(self, messages: list[PromptMessage], ) -> int:
+    def _num_tokens_from_messages(
+        self,
+        messages: list[PromptMessage],
+    ) -> int:
         """Calculate num tokens for baichuan model"""
 
         def tokens(text: str):
@@ -59,10 +81,10 @@ class BaichuanLarguageModel(LargeLanguageModel):
             num_tokens += tokens_per_message
             for key, value in message.items():
                 if isinstance(value, list):
-                    text = ''
+                    text = ""
                     for item in value:
-                        if isinstance(item, dict) and item['type'] == 'text':
-                            text += item['text']
+                        if isinstance(item, dict) and item["type"] == "text":
+                            text += item["text"]
 
                     value = text
 
@@ -92,11 +114,7 @@ class BaichuanLarguageModel(LargeLanguageModel):
             message = cast(ToolPromptMessage, message)
             message_dict = {
                 "role": "user",
-                "content": [{
-                    "type": "tool_result",
-                    "tool_use_id": message.tool_call_id,
-                    "content": message.content
-                }]
+                "content": [{"type": "tool_result", "tool_use_id": message.tool_call_id, "content": message.content}],
             }
         else:
             raise ValueError(f"Unknown message type {type(message)}")
@@ -105,87 +123,96 @@ class BaichuanLarguageModel(LargeLanguageModel):
 
     def validate_credentials(self, model: str, credentials: dict) -> None:
         # ping
-        instance = BaichuanModel(
-            api_key=credentials['api_key'],
-            secret_key=credentials.get('secret_key', '')
-        )
+        instance = BaichuanModel(api_key=credentials["api_key"], secret_key=credentials.get("secret_key", ""))
 
         try:
-            instance.generate(model=model, stream=False, messages=[
-                BaichuanMessage(content='ping', role='user')
-            ], parameters={
-                'max_tokens': 1,
-            }, timeout=60)
+            instance.generate(
+                model=model,
+                stream=False,
+                messages=[BaichuanMessage(content="ping", role="user")],
+                parameters={
+                    "max_tokens": 1,
+                },
+                timeout=60,
+            )
         except Exception as e:
             raise CredentialsValidateFailedError(f"Invalid API key: {e}")
 
-    def _generate(self, model: str, credentials: dict, prompt_messages: list[PromptMessage],
-                  model_parameters: dict, tools: list[PromptMessageTool] | None = None,
-                  stop: list[str] | None = None, stream: bool = True, user: str | None = None) \
-            -> LLMResult | Generator:
+    def _generate(
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        model_parameters: dict,
+        tools: list[PromptMessageTool] | None = None,
+        stop: list[str] | None = None,
+        stream: bool = True,
+        user: str | None = None,
+    ) -> LLMResult | Generator:
         if tools is not None and len(tools) > 0:
             raise InvokeBadRequestError("Baichuan model doesn't support tools")
 
-        instance = BaichuanModel(
-            api_key=credentials['api_key'],
-            secret_key=credentials.get('secret_key', '')
-        )
+        instance = BaichuanModel(api_key=credentials["api_key"], secret_key=credentials.get("secret_key", ""))
 
         # convert prompt messages to baichuan messages
         messages = [
             BaichuanMessage(
-                content=message.content if isinstance(message.content, str) else ''.join([
-                    content.data for content in message.content
-                ]),
-                role=message.role.value
-            ) for message in prompt_messages
+                content=message.content
+                if isinstance(message.content, str)
+                else "".join([content.data for content in message.content]),
+                role=message.role.value,
+            )
+            for message in prompt_messages
         ]
 
         # invoke model
-        response = instance.generate(model=model, stream=stream, messages=messages, parameters=model_parameters,
-                                     timeout=60)
+        response = instance.generate(
+            model=model, stream=stream, messages=messages, parameters=model_parameters, timeout=60
+        )
 
         if stream:
             return self._handle_chat_generate_stream_response(model, prompt_messages, credentials, response)
 
         return self._handle_chat_generate_response(model, prompt_messages, credentials, response)
 
-    def _handle_chat_generate_response(self, model: str,
-                                       prompt_messages: list[PromptMessage],
-                                       credentials: dict,
-                                       response: BaichuanMessage) -> LLMResult:
+    def _handle_chat_generate_response(
+        self, model: str, prompt_messages: list[PromptMessage], credentials: dict, response: BaichuanMessage
+    ) -> LLMResult:
         # convert baichuan message to llm result
-        usage = self._calc_response_usage(model=model, credentials=credentials,
-                                          prompt_tokens=response.usage['prompt_tokens'],
-                                          completion_tokens=response.usage['completion_tokens'])
+        usage = self._calc_response_usage(
+            model=model,
+            credentials=credentials,
+            prompt_tokens=response.usage["prompt_tokens"],
+            completion_tokens=response.usage["completion_tokens"],
+        )
         return LLMResult(
             model=model,
             prompt_messages=prompt_messages,
-            message=AssistantPromptMessage(
-                content=response.content,
-                tool_calls=[]
-            ),
+            message=AssistantPromptMessage(content=response.content, tool_calls=[]),
             usage=usage,
         )
 
-    def _handle_chat_generate_stream_response(self, model: str,
-                                              prompt_messages: list[PromptMessage],
-                                              credentials: dict,
-                                              response: Generator[BaichuanMessage, None, None]) -> Generator:
+    def _handle_chat_generate_stream_response(
+        self,
+        model: str,
+        prompt_messages: list[PromptMessage],
+        credentials: dict,
+        response: Generator[BaichuanMessage, None, None],
+    ) -> Generator:
         for message in response:
             if message.usage:
-                usage = self._calc_response_usage(model=model, credentials=credentials,
-                                                  prompt_tokens=message.usage['prompt_tokens'],
-                                                  completion_tokens=message.usage['completion_tokens'])
+                usage = self._calc_response_usage(
+                    model=model,
+                    credentials=credentials,
+                    prompt_tokens=message.usage["prompt_tokens"],
+                    completion_tokens=message.usage["completion_tokens"],
+                )
                 yield LLMResultChunk(
                     model=model,
                     prompt_messages=prompt_messages,
                     delta=LLMResultChunkDelta(
                         index=0,
-                        message=AssistantPromptMessage(
-                            content=message.content,
-                            tool_calls=[]
-                        ),
+                        message=AssistantPromptMessage(content=message.content, tool_calls=[]),
                         usage=usage,
                         finish_reason=message.stop_reason if message.stop_reason else None,
                     ),
@@ -196,10 +223,7 @@ class BaichuanLarguageModel(LargeLanguageModel):
                     prompt_messages=prompt_messages,
                     delta=LLMResultChunkDelta(
                         index=0,
-                        message=AssistantPromptMessage(
-                            content=message.content,
-                            tool_calls=[]
-                        ),
+                        message=AssistantPromptMessage(content=message.content, tool_calls=[]),
                         finish_reason=message.stop_reason if message.stop_reason else None,
                     ),
                 )
@@ -215,21 +239,13 @@ class BaichuanLarguageModel(LargeLanguageModel):
         :return: Invoke error mapping
         """
         return {
-            InvokeConnectionError: [
-            ],
-            InvokeServerUnavailableError: [
-                InternalServerError
-            ],
-            InvokeRateLimitError: [
-                RateLimitReachedError
-            ],
+            InvokeConnectionError: [],
+            InvokeServerUnavailableError: [InternalServerError],
+            InvokeRateLimitError: [RateLimitReachedError],
             InvokeAuthorizationError: [
                 InvalidAuthenticationError,
                 InsufficientAccountBalance,
                 InvalidAPIKeyError,
             ],
-            InvokeBadRequestError: [
-                BadRequestError,
-                KeyError
-            ]
+            InvokeBadRequestError: [BadRequestError, KeyError],
         }

@@ -34,18 +34,18 @@ class HttpRequestNode(BaseNode):
     @classmethod
     def get_default_config(cls, filters: dict | None = None) -> dict:
         return {
-            'type': 'http-request',
-            'config': {
-                'method': 'get',
-                'authorization': {
-                    'type': 'no-auth',
+            "type": "http-request",
+            "config": {
+                "method": "get",
+                "authorization": {
+                    "type": "no-auth",
                 },
-                'body': {'type': 'none'},
-                'timeout': {
+                "body": {"type": "none"},
+                "timeout": {
                     **HTTP_REQUEST_DEFAULT_TIMEOUT.model_dump(),
-                    'max_connect_timeout': MAX_CONNECT_TIMEOUT,
-                    'max_read_timeout': MAX_READ_TIMEOUT,
-                    'max_write_timeout': MAX_WRITE_TIMEOUT,
+                    "max_connect_timeout": MAX_CONNECT_TIMEOUT,
+                    "max_read_timeout": MAX_READ_TIMEOUT,
+                    "max_write_timeout": MAX_WRITE_TIMEOUT,
                 },
             },
         }
@@ -54,7 +54,9 @@ class HttpRequestNode(BaseNode):
         node_data: HttpRequestNodeData = cast(HttpRequestNodeData, self.node_data)
         # TODO: Switch to use segment directly
         if node_data.authorization.config and node_data.authorization.config.api_key:
-            node_data.authorization.config.api_key = parser.convert_template(template=node_data.authorization.config.api_key, variable_pool=variable_pool).text
+            node_data.authorization.config.api_key = parser.convert_template(
+                template=node_data.authorization.config.api_key, variable_pool=variable_pool
+            ).text
 
         # init http executor
         http_executor = None
@@ -69,7 +71,7 @@ class HttpRequestNode(BaseNode):
             process_data = {}
             if http_executor:
                 process_data = {
-                    'request': http_executor.to_raw_request(),
+                    "request": http_executor.to_raw_request(),
                 }
             return NodeRunResult(
                 status=WorkflowNodeExecutionStatus.FAILED,
@@ -82,13 +84,13 @@ class HttpRequestNode(BaseNode):
         return NodeRunResult(
             status=WorkflowNodeExecutionStatus.SUCCEEDED,
             outputs={
-                'status_code': response.status_code,
-                'body': response.content if not files else '',
-                'headers': response.headers,
-                'files': files,
+                "status_code": response.status_code,
+                "body": response.content if not files else "",
+                "headers": response.headers,
+                "files": files,
             },
             process_data={
-                'request': http_executor.to_raw_request(),
+                "request": http_executor.to_raw_request(),
             },
         )
 
@@ -124,7 +126,7 @@ class HttpRequestNode(BaseNode):
 
             return variable_mapping
         except Exception as e:
-            logging.exception(f'Failed to extract variable selector to variable mapping: {e}')
+            logging.exception(f"Failed to extract variable selector to variable mapping: {e}")
             return {}
 
     def extract_files(self, url: str, response: HttpExecutorResponse) -> list[FileVar]:
@@ -138,7 +140,7 @@ class HttpRequestNode(BaseNode):
             # extract filename from url
             filename = path.basename(url)
             # extract extension if possible
-            extension = guess_extension(mimetype) or '.bin'
+            extension = guess_extension(mimetype) or ".bin"
 
             tool_file = ToolFileManager.create_file_by_raw(
                 user_id=self.user_id,

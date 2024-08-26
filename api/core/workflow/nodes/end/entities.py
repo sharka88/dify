@@ -6,4 +6,5 @@ class EndNodeData(BaseNodeData):
     """
     END Node Data.
     """
+
     outputs: list[VariableSelector]

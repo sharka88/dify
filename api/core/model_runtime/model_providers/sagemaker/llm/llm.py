@@ -30,13 +30,20 @@ class SageMakerLargeLanguageModel(LargeLanguageModel):
     """
     Model class for Cohere large language model.
     """
+
     sagemaker_client: Any = None
 
-    def _invoke(self, model: str, credentials: dict,
-                prompt_messages: list[PromptMessage], model_parameters: dict,
-                tools: Optional[list[PromptMessageTool]] = None, stop: Optional[list[str]] = None,
-                stream: bool = True, user: Optional[str] = None) \
-            -> Union[LLMResult, Generator]:
+    def _invoke(
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        model_parameters: dict,
+        tools: Optional[list[PromptMessageTool]] = None,
+        stop: Optional[list[str]] = None,
+        stream: bool = True,
+        user: Optional[str] = None,
+    ) -> Union[LLMResult, Generator]:
         """
         Invoke large language model
 
@@ -54,54 +61,49 @@ class SageMakerLargeLanguageModel(LargeLanguageModel):
         model_mode = self.get_model_mode(model, credentials)
 
         if not self.sagemaker_client:
-            access_key = credentials.get('access_key')
-            secret_key = credentials.get('secret_key')
-            aws_region = credentials.get('aws_region')
+            access_key = credentials.get("access_key")
+            secret_key = credentials.get("secret_key")
+            aws_region = credentials.get("aws_region")
             if aws_region:
                 if access_key and secret_key:
-                    self.sagemaker_client = boto3.client("sagemaker-runtime", 
+                    self.sagemaker_client = boto3.client(
+                        "sagemaker-runtime",
                         aws_access_key_id=access_key,
                         aws_secret_access_key=secret_key,
-                        region_name=aws_region)
+                        region_name=aws_region,
+                    )
                 else:
                     self.sagemaker_client = boto3.client("sagemaker-runtime", region_name=aws_region)
             else:
                 self.sagemaker_client = boto3.client("sagemaker-runtime")
 
-
-        sagemaker_endpoint = credentials.get('sagemaker_endpoint')
+        sagemaker_endpoint = credentials.get("sagemaker_endpoint")
         response_model = self.sagemaker_client.invoke_endpoint(
-                    EndpointName=sagemaker_endpoint,
-                    Body=json.dumps(
-                    {
-                        "inputs": prompt_messages[0].content,
-                        "parameters": { "stop" : stop},
-                        "history" : []
-                    }
-                    ),
-                    ContentType="application/json",
-                )
+            EndpointName=sagemaker_endpoint,
+            Body=json.dumps({"inputs": prompt_messages[0].content, "parameters": {"stop": stop}, "history": []}),
+            ContentType="application/json",
+        )
 
-        assistant_text = response_model['Body'].read().decode('utf8')
+        assistant_text = response_model["Body"].read().decode("utf8")
 
         # transform assistant message to prompt message
-        assistant_prompt_message = AssistantPromptMessage(
-            content=assistant_text
-        )
+        assistant_prompt_message = AssistantPromptMessage(content=assistant_text)
 
         usage = self._calc_response_usage(model, credentials, 0, 0)
 
         response = LLMResult(
-            model=model,
-            prompt_messages=prompt_messages,
-            message=assistant_prompt_message,
-            usage=usage
+            model=model, prompt_messages=prompt_messages, message=assistant_prompt_message, usage=usage
         )
 
         return response
 
-    def get_num_tokens(self, model: str, credentials: dict, prompt_messages: list[PromptMessage],
-                       tools: Optional[list[PromptMessageTool]] = None) -> int:
+    def get_num_tokens(
+        self,
+        model: str,
+        credentials: dict,
+        prompt_messages: list[PromptMessage],
+        tools: Optional[list[PromptMessageTool]] = None,
+    ) -> int:
         """
         Get number of tokens for given prompt messages
 
@@ -144,95 +146,69 @@ class SageMakerLargeLanguageModel(LargeLanguageModel):
         :return: Invoke error mapping
         """
         return {
-            InvokeConnectionError: [
-                InvokeConnectionError
-            ],
-            InvokeServerUnavailableError: [
-                InvokeServerUnavailableError
-            ],
-            InvokeRateLimitError: [
-                InvokeRateLimitError
-            ],
-            InvokeAuthorizationError: [
-                InvokeAuthorizationError
-            ],
-            InvokeBadRequestError: [
-                InvokeBadRequestError,
-                KeyError,
-                ValueError
-            ]
+            InvokeConnectionError: [InvokeConnectionError],
+            InvokeServerUnavailableError: [InvokeServerUnavailableError],
+            InvokeRateLimitError: [InvokeRateLimitError],
+            InvokeAuthorizationError: [InvokeAuthorizationError],
+            InvokeBadRequestError: [InvokeBadRequestError, KeyError, ValueError],
         }
 
     def get_customizable_model_schema(self, model: str, credentials: dict) -> AIModelEntity | None:
         """
-            used to define customizable model schema
+        used to define customizable model schema
         """
         rules = [
             ParameterRule(
-                name='temperature',
+                name="temperature",
                 type=ParameterType.FLOAT,
-                use_template='temperature',
-                label=I18nObject(
-                    zh_Hans='温度',
-                    en_US='Temperature'
-                ),
+                use_template="temperature",
+                label=I18nObject(zh_Hans="温度", en_US="Temperature"),
             ),
             ParameterRule(
-                name='top_p',
+                name="top_p",
                 type=ParameterType.FLOAT,
-                use_template='top_p',
-                label=I18nObject(
-                    zh_Hans='Top P',
-                    en_US='Top P'
-                )
+                use_template="top_p",
+                label=I18nObject(zh_Hans="Top P", en_US="Top P"),
             ),
             ParameterRule(
-                name='max_tokens',
+                name="max_tokens",
                 type=ParameterType.INT,
-                use_template='max_tokens',
+                use_template="max_tokens",
                 min=1,
-                max=credentials.get('context_length', 2048),
+                max=credentials.get("context_length", 2048),
                 default=512,
-                label=I18nObject(
-                    zh_Hans='最大生成长度',
-                    en_US='Max Tokens'
-                )
-            )
+                label=I18nObject(zh_Hans="最大生成长度", en_US="Max Tokens"),
+            ),
         ]
 
         completion_type = LLMMode.value_of(credentials["mode"])
 
         if completion_type == LLMMode.CHAT:
-            print(f"completion_type : {LLMMode.CHAT.value}") 
+            print(f"completion_type : {LLMMode.CHAT.value}")
 
         if completion_type == LLMMode.COMPLETION:
-            print(f"completion_type : {LLMMode.COMPLETION.value}") 
+            print(f"completion_type : {LLMMode.COMPLETION.value}")
 
         features = []
 
-        support_function_call = credentials.get('support_function_call', False)
+        support_function_call = credentials.get("support_function_call", False)
         if support_function_call:
             features.append(ModelFeature.TOOL_CALL)
 
-        support_vision = credentials.get('support_vision', False)
+        support_vision = credentials.get("support_vision", False)
         if support_vision:
             features.append(ModelFeature.VISION)
 
-        context_length = credentials.get('context_length', 2048)
+        context_length = credentials.get("context_length", 2048)
 
         entity = AIModelEntity(
             model=model,
-            label=I18nObject(
-                en_US=model
-            ),
+            label=I18nObject(en_US=model),
             fetch_from=FetchFrom.CUSTOMIZABLE_MODEL,
             model_type=ModelType.LLM,
             features=features,
-            model_properties={
-                ModelPropertyKey.MODE: completion_type,
-                ModelPropertyKey.CONTEXT_SIZE: context_length
-            },
-            parameter_rules=rules
+            model_properties={ModelPropertyKey.MODE: completion_type, ModelPropertyKey.CONTEXT_SIZE: context_length},
+            parameter_rules=rules,
         )
 
         return entity

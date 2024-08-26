@@ -8,6 +8,7 @@ class LoopNode(BaseIterationNode):
     """
     Loop Node.
     """
+
     _node_data_cls = LoopNodeData
     _node_type = NodeType.LOOP
 
