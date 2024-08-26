@@ -23,13 +23,9 @@ class IfElseNode(BaseNode):
         node_data = self.node_data
         node_data = cast(IfElseNodeData, node_data)
 
-        node_inputs = {
-            "conditions": []
-        }
+        node_inputs = {"conditions": []}
 
-        process_datas = {
-            "condition_results": []
-        }
+        process_datas = {"condition_results": []}
 
         input_conditions = []
         final_result = False
@@ -64,21 +60,14 @@ class IfElseNode(BaseNode):
                 selected_case_id = "true" if final_result else "false"
 
                 process_datas["condition_results"].append(
-                    {
-                        "group": "default",
-                        "results": group_result,
-                        "final_result": final_result
-                    }
+                    {"group": "default", "results": group_result, "final_result": final_result}
                 )
 
             node_inputs["conditions"] = input_conditions
 
         except Exception as e:
             return NodeRunResult(
-                status=WorkflowNodeExecutionStatus.FAILED,
-                inputs=node_inputs,
-                process_data=process_datas,
-                error=str(e)
+                status=WorkflowNodeExecutionStatus.FAILED, inputs=node_inputs, process_data=process_datas, error=str(e)
             )
 
         outputs = {"result": final_result, "selected_case_id": selected_case_id}
@@ -88,7 +77,7 @@ class IfElseNode(BaseNode):
             inputs=node_inputs,
             process_data=process_datas,
             edge_source_handle=selected_case_id if selected_case_id else "false",  # Use case ID or 'default'
-            outputs=outputs
+            outputs=outputs,
         )
 
         return data
@@ -164,7 +153,7 @@ class IfElseNode(BaseNode):
                 {
                     "actual_value": actual_variable,
                     "expected_value": expected_value,
-                    "comparison_operator": comparison_operator
+                    "comparison_operator": comparison_operator,
                 }
             )
 
@@ -184,7 +173,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, str | list):
-            raise ValueError('Invalid actual value type: string or array')
+            raise ValueError("Invalid actual value type: string or array")
 
         if expected_value not in actual_value:
             return False
@@ -201,7 +190,7 @@ class IfElseNode(BaseNode):
             return True
 
         if not isinstance(actual_value, str | list):
-            raise ValueError('Invalid actual value type: string or array')
+            raise ValueError("Invalid actual value type: string or array")
 
         if expected_value in actual_value:
             return False
@@ -218,7 +207,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, str):
-            raise ValueError('Invalid actual value type: string')
+            raise ValueError("Invalid actual value type: string")
 
         if not actual_value.startswith(expected_value):
             return False
@@ -235,7 +224,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, str):
-            raise ValueError('Invalid actual value type: string')
+            raise ValueError("Invalid actual value type: string")
 
         if not actual_value.endswith(expected_value):
             return False
@@ -252,7 +241,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, str):
-            raise ValueError('Invalid actual value type: string')
+            raise ValueError("Invalid actual value type: string")
 
         if actual_value != expected_value:
             return False
@@ -269,7 +258,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, str):
-            raise ValueError('Invalid actual value type: string')
+            raise ValueError("Invalid actual value type: string")
 
         if actual_value == expected_value:
             return False
@@ -306,7 +295,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, int | float):
-            raise ValueError('Invalid actual value type: number')
+            raise ValueError("Invalid actual value type: number")
 
         if isinstance(actual_value, int):
             expected_value = int(expected_value)
@@ -328,7 +317,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, int | float):
-            raise ValueError('Invalid actual value type: number')
+            raise ValueError("Invalid actual value type: number")
 
         if isinstance(actual_value, int):
             expected_value = int(expected_value)
@@ -350,7 +339,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, int | float):
-            raise ValueError('Invalid actual value type: number')
+            raise ValueError("Invalid actual value type: number")
 
         if isinstance(actual_value, int):
             expected_value = int(expected_value)
@@ -372,7 +361,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, int | float):
-            raise ValueError('Invalid actual value type: number')
+            raise ValueError("Invalid actual value type: number")
 
         if isinstance(actual_value, int):
             expected_value = int(expected_value)
@@ -394,7 +383,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, int | float):
-            raise ValueError('Invalid actual value type: number')
+            raise ValueError("Invalid actual value type: number")
 
         if isinstance(actual_value, int):
             expected_value = int(expected_value)
@@ -416,7 +405,7 @@ class IfElseNode(BaseNode):
             return False
 
         if not isinstance(actual_value, int | float):
-            raise ValueError('Invalid actual value type: number')
+            raise ValueError("Invalid actual value type: number")
 
         if isinstance(actual_value, int):
             expected_value = int(expected_value)

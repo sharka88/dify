@@ -13,6 +13,7 @@ class IterationNode(BaseIterationNode):
     """
     Iteration Node.
     """
+
     _node_data_cls = IterationNodeData
     _node_type = NodeType.ITERATION
 
@@ -26,12 +27,14 @@ class IterationNode(BaseIterationNode):
         if not isinstance(iterator, list):
             raise ValueError(f"Invalid iterator value: {iterator}, please provide a list.")
 
-        state = IterationState(iteration_node_id=self.node_id, index=-1, inputs={
-            'iterator_selector': iterator
-        }, outputs=[], metadata=IterationState.MetaData(
-            iterator_length=len(iterator) if iterator is not None else 0
-        ))
-        
+        state = IterationState(
+            iteration_node_id=self.node_id,
+            index=-1,
+            inputs={"iterator_selector": iterator},
+            outputs=[],
+            metadata=IterationState.MetaData(iterator_length=len(iterator) if iterator is not None else 0),
+        )
+
         self._set_current_iteration_variable(variable_pool, state)
         return state
 
@@ -49,14 +52,11 @@ class IterationNode(BaseIterationNode):
         node_data = cast(IterationNodeData, self.node_data)
         if self._reached_iteration_limit(variable_pool, state):
             return NodeRunResult(
-                status=WorkflowNodeExecutionStatus.SUCCEEDED,
-                outputs={
-                    'output': jsonable_encoder(state.outputs)
-                }
+                status=WorkflowNodeExecutionStatus.SUCCEEDED, outputs={"output": jsonable_encoder(state.outputs)}
             )
-        
+
         return node_data.start_node_id
-    
+
     def _set_current_iteration_variable(self, variable_pool: VariablePool, state: IterationState):
         """
         Set current iteration variable.
@@ -64,15 +64,15 @@ class IterationNode(BaseIterationNode):
         """
         node_data = cast(IterationNodeData, self.node_data)
 
-        variable_pool.add((self.node_id, 'index'), state.index)
+        variable_pool.add((self.node_id, "index"), state.index)
         # get the iterator value
         iterator = variable_pool.get_any(node_data.iterator_selector)
 
         if iterator is None or not isinstance(iterator, list):
             return
-        
+
         if state.index < len(iterator):
-            variable_pool.add((self.node_id, 'item'), iterator[state.index])
+            variable_pool.add((self.node_id, "item"), iterator[state.index])
 
     def _next_iteration(self, variable_pool: VariablePool, state: IterationState):
         """
@@ -88,13 +88,13 @@ class IterationNode(BaseIterationNode):
         :return: True if iteration limit is reached, False otherwise
         """
         node_data = cast(IterationNodeData, self.node_data)
-        iterator =  variable_pool.get_any(node_data.iterator_selector)
+        iterator = variable_pool.get_any(node_data.iterator_selector)
 
         if iterator is None or not isinstance(iterator, list):
             return True
 
         return state.index >= len(iterator)
-    
+
     def _resolve_current_output(self, variable_pool: VariablePool, state: IterationState):
         """
         Resolve current output.
@@ -120,5 +120,5 @@ class IterationNode(BaseIterationNode):
         :return:
         """
         return {
-            'input_selector': node_data.iterator_selector,
+            "input_selector": node_data.iterator_selector,
         }

@@ -21,8 +21,10 @@ CODE_EXECUTION_API_KEY = dify_config.CODE_EXECUTION_API_KEY
 
 CODE_EXECUTION_TIMEOUT = Timeout(connect=10, write=10, read=60, pool=None)
 
+
 class CodeExecutionException(Exception):
     pass
+
 
 class CodeExecutionResponse(BaseModel):
     class Data(BaseModel):
@@ -35,9 +37,9 @@ class CodeExecutionResponse(BaseModel):
 
 
 class CodeLanguage(str, Enum):
-    PYTHON3 = 'python3'
-    JINJA2 = 'jinja2'
-    JAVASCRIPT = 'javascript'
+    PYTHON3 = "python3"
+    JINJA2 = "jinja2"
+    JAVASCRIPT = "javascript"
 
 
 class CodeExecutor:
@@ -51,66 +53,63 @@ class CodeExecutor:
     }
 
     code_language_to_running_language = {
-        CodeLanguage.JAVASCRIPT: 'nodejs',
+        CodeLanguage.JAVASCRIPT: "nodejs",
         CodeLanguage.JINJA2: CodeLanguage.PYTHON3,
         CodeLanguage.PYTHON3: CodeLanguage.PYTHON3,
     }
 
-    supported_dependencies_languages: set[CodeLanguage] = {
-        CodeLanguage.PYTHON3
-    }
+    supported_dependencies_languages: set[CodeLanguage] = {CodeLanguage.PYTHON3}
 
     @classmethod
-    def execute_code(cls, 
-                     language: CodeLanguage, 
-                     preload: str, 
-                     code: str) -> str:
+    def execute_code(cls, language: CodeLanguage, preload: str, code: str) -> str:
         """
         Execute code
         :param language: code language
         :param code: code
         :return:
         """
-        url = URL(CODE_EXECUTION_ENDPOINT) / 'v1' / 'sandbox' / 'run'
+        url = URL(CODE_EXECUTION_ENDPOINT) / "v1" / "sandbox" / "run"
 
-        headers = {
-            'X-Api-Key': CODE_EXECUTION_API_KEY
-        }
+        headers = {"X-Api-Key": CODE_EXECUTION_API_KEY}
 
         data = {
-            'language': cls.code_language_to_running_language.get(language),
-            'code': code,
-            'preload': preload,
-            'enable_network': True
+            "language": cls.code_language_to_running_language.get(language),
+            "code": code,
+            "preload": preload,
+            "enable_network": True,
         }
 
         try:
             response = post(str(url), json=data, headers=headers, timeout=CODE_EXECUTION_TIMEOUT)
             if response.status_code == 503:
-                raise CodeExecutionException('Code execution service is unavailable')
+                raise CodeExecutionException("Code execution service is unavailable")
             elif response.status_code != 200:
-                raise Exception(f'Failed to execute code, got status code {response.status_code}, please check if the sandbox service is running')
+                raise Exception(
+                    f"Failed to execute code, got status code {response.status_code}, please check if the sandbox service is running"
+                )
         except CodeExecutionException as e:
             raise e
         except Exception as e:
-            raise CodeExecutionException('Failed to execute code, which is likely a network issue,'
-                                         ' please check if the sandbox service is running.'
-                                         f' ( Error: {str(e)} )')
-        
+            raise CodeExecutionException(
+                "Failed to execute code, which is likely a network issue,"
+                " please check if the sandbox service is running."
+                f" ( Error: {str(e)} )"
+            )
+
         try:
             response = response.json()
         except:
-            raise CodeExecutionException('Failed to parse response')
+            raise CodeExecutionException("Failed to parse response")
 
-        if (code := response.get('code')) != 0:
+        if (code := response.get("code")) != 0:
             raise CodeExecutionException(f"Got error code: {code}. Got error msg: {response.get('message')}")
-        
+
         response = CodeExecutionResponse(**response)
-        
+
         if response.data.error:
             raise CodeExecutionException(response.data.error)
-        
-        return response.data.stdout or ''
+
+        return response.data.stdout or ""
 
     @classmethod
     def execute_workflow_code_template(cls, language: CodeLanguage, code: str, inputs: dict) -> dict:
@@ -123,7 +122,7 @@ class CodeExecutor:
         """
         template_transformer = cls.code_template_transformers.get(language)
         if not template_transformer:
-            raise CodeExecutionException(f'Unsupported language {language}')
+            raise CodeExecutionException(f"Unsupported language {language}")
 
         runner, preload = template_transformer.transform_caller(code, inputs)
 
@@ -133,4 +132,3 @@ class CodeExecutor:
             raise e
 
         return template_transformer.transform_response(response)
-    

@@ -63,6 +63,7 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
     """
     WorkflowAppGenerateTaskPipeline is a class that generate stream output and state management for Application.
     """
+
     _workflow: Workflow
     _user: Union[Account, EndUser]
     _task_state: WorkflowTaskState
@@ -70,11 +71,14 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
     _workflow_system_variables: dict[SystemVariableKey, Any]
     _iteration_nested_relations: dict[str, list[str]]
 
-    def __init__(self, application_generate_entity: WorkflowAppGenerateEntity,
-                 workflow: Workflow,
-                 queue_manager: AppQueueManager,
-                 user: Union[Account, EndUser],
-                 stream: bool) -> None:
+    def __init__(
+        self,
+        application_generate_entity: WorkflowAppGenerateEntity,
+        workflow: Workflow,
+        queue_manager: AppQueueManager,
+        user: Union[Account, EndUser],
+        stream: bool,
+    ) -> None:
         """
         Initialize GenerateTaskPipeline.
         :param application_generate_entity: application generate entity
@@ -93,12 +97,10 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
         self._workflow = workflow
         self._workflow_system_variables = {
             SystemVariableKey.FILES: application_generate_entity.files,
-            SystemVariableKey.USER_ID: user_id
+            SystemVariableKey.USER_ID: user_id,
         }
 
-        self._task_state = WorkflowTaskState(
-            iteration_nested_node_ids=[]
-        )
+        self._task_state = WorkflowTaskState(iteration_nested_node_ids=[])
         self._stream_generate_nodes = self._get_stream_generate_nodes()
         self._iteration_nested_relations = self._get_iteration_nested_relations(self._workflow.graph_dict)
 
@@ -111,16 +113,13 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
         db.session.refresh(self._user)
         db.session.close()
 
-        generator = self._wrapper_process_stream_response(
-            trace_manager=self._application_generate_entity.trace_manager
-        )
+        generator = self._wrapper_process_stream_response(trace_manager=self._application_generate_entity.trace_manager)
         if self._stream:
             return self._to_stream_response(generator)
         else:
             return self._to_blocking_response(generator)
 
-    def _to_blocking_response(self, generator: Generator[StreamResponse, None, None]) \
-            -> WorkflowAppBlockingResponse:
+    def _to_blocking_response(self, generator: Generator[StreamResponse, None, None]) -> WorkflowAppBlockingResponse:
         """
         To blocking response.
         :return:
@@ -129,8 +128,9 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
             if isinstance(stream_response, ErrorStreamResponse):
                 raise stream_response.err
             elif isinstance(stream_response, WorkflowFinishStreamResponse):
-                workflow_run = db.session.query(WorkflowRun).filter(
-                    WorkflowRun.id == self._task_state.workflow_run_id).first()
+                workflow_run = (
+                    db.session.query(WorkflowRun).filter(WorkflowRun.id == self._task_state.workflow_run_id).first()
+                )
 
                 response = WorkflowAppBlockingResponse(
                     task_id=self._application_generate_entity.task_id,
@@ -145,26 +145,26 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
                         total_tokens=workflow_run.total_tokens,
                         total_steps=workflow_run.total_steps,
                         created_at=int(workflow_run.created_at.timestamp()),
-                        finished_at=int(workflow_run.finished_at.timestamp())
-                    )
+                        finished_at=int(workflow_run.finished_at.timestamp()),
+                    ),
                 )
 
                 return response
             else:
                 continue
 
-        raise Exception('Queue listening stopped unexpectedly.')
+        raise Exception("Queue listening stopped unexpectedly.")
 
-    def _to_stream_response(self, generator: Generator[StreamResponse, None, None]) \
-            -> Generator[WorkflowAppStreamResponse, None, None]:
+    def _to_stream_response(
+        self, generator: Generator[StreamResponse, None, None]
+    ) -> Generator[WorkflowAppStreamResponse, None, None]:
         """
         To stream response.
         :return:
         """
         for stream_response in generator:
             yield WorkflowAppStreamResponse(
-                workflow_run_id=self._task_state.workflow_run_id,
-                stream_response=stream_response
+                workflow_run_id=self._task_state.workflow_run_id, stream_response=stream_response
             )
 
     def _listenAudioMsg(self, publisher, task_id: str):
@@ -175,17 +175,20 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
             return MessageAudioStreamResponse(audio=audio_msg.audio, task_id=task_id)
         return None
 
-    def _wrapper_process_stream_response(self, trace_manager: Optional[TraceQueueManager] = None) -> \
-            Generator[StreamResponse, None, None]:
-
+    def _wrapper_process_stream_response(
+        self, trace_manager: Optional[TraceQueueManager] = None
+    ) -> Generator[StreamResponse, None, None]:
         publisher = None
         task_id = self._application_generate_entity.task_id
         tenant_id = self._application_generate_entity.app_config.tenant_id
         features_dict = self._workflow.features_dict
 
-        if features_dict.get('text_to_speech') and features_dict['text_to_speech'].get('enabled') and features_dict[
-                'text_to_speech'].get('autoPlay') == 'enabled':
-            publisher = AppGeneratorTTSPublisher(tenant_id, features_dict['text_to_speech'].get('voice'))
+        if (
+            features_dict.get("text_to_speech")
+            and features_dict["text_to_speech"].get("enabled")
+            and features_dict["text_to_speech"].get("autoPlay") == "enabled"
+        ):
+            publisher = AppGeneratorTTSPublisher(tenant_id, features_dict["text_to_speech"].get("voice"))
         for response in self._process_stream_response(publisher=publisher, trace_manager=trace_manager):
             while True:
                 audio_response = self._listenAudioMsg(publisher, task_id=task_id)
@@ -213,13 +216,10 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
             except Exception as e:
                 logger.error(e)
                 break
-        yield MessageAudioEndStreamResponse(audio='', task_id=task_id)
-
+        yield MessageAudioEndStreamResponse(audio="", task_id=task_id)
 
     def _process_stream_response(
-        self,
-        publisher: AppGeneratorTTSPublisher,
-        trace_manager: Optional[TraceQueueManager] = None
+        self, publisher: AppGeneratorTTSPublisher, trace_manager: Optional[TraceQueueManager] = None
     ) -> Generator[StreamResponse, None, None]:
         """
         Process stream response.
@@ -237,8 +237,7 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
             elif isinstance(event, QueueWorkflowStartedEvent):
                 workflow_run = self._handle_workflow_start()
                 yield self._workflow_start_to_stream_response(
-                    task_id=self._application_generate_entity.task_id,
-                    workflow_run=workflow_run
+                    task_id=self._application_generate_entity.task_id, workflow_run=workflow_run
                 )
             elif isinstance(event, QueueNodeStartedEvent):
                 workflow_node_execution = self._handle_node_start(event)
@@ -253,20 +252,18 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
                 yield self._workflow_node_start_to_stream_response(
                     event=event,
                     task_id=self._application_generate_entity.task_id,
-                    workflow_node_execution=workflow_node_execution
+                    workflow_node_execution=workflow_node_execution,
                 )
             elif isinstance(event, QueueNodeSucceededEvent | QueueNodeFailedEvent):
                 workflow_node_execution = self._handle_node_finished(event)
 
                 yield self._workflow_node_finish_to_stream_response(
-                    task_id=self._application_generate_entity.task_id,
-                    workflow_node_execution=workflow_node_execution
+                    task_id=self._application_generate_entity.task_id, workflow_node_execution=workflow_node_execution
                 )
 
                 if isinstance(event, QueueNodeFailedEvent):
                     yield from self._handle_iteration_exception(
-                        task_id=self._application_generate_entity.task_id,
-                        error=f'Child node failed: {event.error}'
+                        task_id=self._application_generate_entity.task_id, error=f"Child node failed: {event.error}"
                     )
             elif isinstance(event, QueueIterationStartEvent | QueueIterationNextEvent | QueueIterationCompletedEvent):
                 if isinstance(event, QueueIterationNextEvent):
@@ -279,25 +276,20 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
                 yield self._handle_iteration_to_stream_response(self._application_generate_entity.task_id, event)
                 self._handle_iteration_operation(event)
             elif isinstance(event, QueueStopEvent | QueueWorkflowSucceededEvent | QueueWorkflowFailedEvent):
-                workflow_run = self._handle_workflow_finished(
-                    event, trace_manager=trace_manager
-                )
+                workflow_run = self._handle_workflow_finished(event, trace_manager=trace_manager)
 
                 # save workflow app log
                 self._save_workflow_app_log(workflow_run)
 
                 yield self._workflow_finish_to_stream_response(
-                    task_id=self._application_generate_entity.task_id,
-                    workflow_run=workflow_run
+                    task_id=self._application_generate_entity.task_id, workflow_run=workflow_run
                 )
             elif isinstance(event, QueueTextChunkEvent):
                 delta_text = event.text
                 if delta_text is None:
                     continue
 
-                if not self._is_stream_out_support(
-                        event=event
-                ):
+                if not self._is_stream_out_support(event=event):
                     continue
 
                 self._task_state.answer += delta_text
@@ -311,7 +303,6 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
 
         if publisher:
             publisher.publish(None)
-
 
     def _save_workflow_app_log(self, workflow_run: WorkflowRun) -> None:
         """
@@ -335,7 +326,7 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
             workflow_id=workflow_run.workflow_id,
             workflow_run_id=workflow_run.id,
             created_from=created_from.value,
-            created_by_role=('account' if isinstance(self._user, Account) else 'end_user'),
+            created_by_role=("account" if isinstance(self._user, Account) else "end_user"),
             created_by=self._user.id,
         )
         db.session.add(workflow_app_log)
@@ -349,8 +340,7 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
         :return:
         """
         response = TextChunkStreamResponse(
-            task_id=self._application_generate_entity.task_id,
-            data=TextChunkStreamResponse.Data(text=text)
+            task_id=self._application_generate_entity.task_id, data=TextChunkStreamResponse.Data(text=text)
         )
 
         return response
@@ -362,8 +352,7 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
         :return:
         """
         return TextReplaceStreamResponse(
-            task_id=self._application_generate_entity.task_id,
-            text=TextReplaceStreamResponse.Data(text=text)
+            task_id=self._application_generate_entity.task_id, text=TextReplaceStreamResponse.Data(text=text)
         )
 
     def _get_stream_generate_nodes(self) -> dict[str, WorkflowStreamGenerateNodes]:
@@ -373,16 +362,13 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
         """
         # find all answer nodes
         graph = self._workflow.graph_dict
-        end_node_configs = [
-            node for node in graph['nodes']
-            if node.get('data', {}).get('type') == NodeType.END.value
-        ]
+        end_node_configs = [node for node in graph["nodes"] if node.get("data", {}).get("type") == NodeType.END.value]
 
         # parse stream output node value selectors of end nodes
         stream_generate_routes = {}
         for node_config in end_node_configs:
             # get generate route for stream output
-            end_node_id = node_config['id']
+            end_node_id = node_config["id"]
             generate_nodes = EndNode.extract_generate_nodes(graph, node_config)
             start_node_ids = self._get_end_start_at_node_ids(graph, end_node_id)
             if not start_node_ids:
@@ -390,27 +376,25 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
 
             for start_node_id in start_node_ids:
                 stream_generate_routes[start_node_id] = WorkflowStreamGenerateNodes(
-                    end_node_id=end_node_id,
-                    stream_node_ids=generate_nodes
+                    end_node_id=end_node_id, stream_node_ids=generate_nodes
                 )
 
         return stream_generate_routes
 
-    def _get_end_start_at_node_ids(self, graph: dict, target_node_id: str) \
-            -> list[str]:
+    def _get_end_start_at_node_ids(self, graph: dict, target_node_id: str) -> list[str]:
         """
         Get end start at node id.
         :param graph: graph
         :param target_node_id: target node ID
         :return:
         """
-        nodes = graph.get('nodes')
-        edges = graph.get('edges')
+        nodes = graph.get("nodes")
+        edges = graph.get("edges")
 
         # fetch all ingoing edges from source node
         ingoing_edges = []
         for edge in edges:
-            if edge.get('target') == target_node_id:
+            if edge.get("target") == target_node_id:
                 ingoing_edges.append(edge)
 
         if not ingoing_edges:
@@ -418,26 +402,26 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
 
         start_node_ids = []
         for ingoing_edge in ingoing_edges:
-            source_node_id = ingoing_edge.get('source')
-            source_node = next((node for node in nodes if node.get('id') == source_node_id), None)
+            source_node_id = ingoing_edge.get("source")
+            source_node = next((node for node in nodes if node.get("id") == source_node_id), None)
             if not source_node:
                 continue
 
-            node_type = source_node.get('data', {}).get('type')
-            node_iteration_id = source_node.get('data', {}).get('iteration_id')
+            node_type = source_node.get("data", {}).get("type")
+            node_iteration_id = source_node.get("data", {}).get("iteration_id")
             iteration_start_node_id = None
             if node_iteration_id:
-                iteration_node = next((node for node in nodes if node.get('id') == node_iteration_id), None)
-                iteration_start_node_id = iteration_node.get('data', {}).get('start_node_id')
+                iteration_node = next((node for node in nodes if node.get("id") == node_iteration_id), None)
+                iteration_start_node_id = iteration_node.get("data", {}).get("start_node_id")
 
-            if node_type in [
-                NodeType.IF_ELSE.value,
-                NodeType.QUESTION_CLASSIFIER.value
-            ]:
+            if node_type in [NodeType.IF_ELSE.value, NodeType.QUESTION_CLASSIFIER.value]:
                 start_node_id = target_node_id
                 start_node_ids.append(start_node_id)
-            elif node_type == NodeType.START.value or \
-                node_iteration_id is not None and iteration_start_node_id == source_node.get('id'):
+            elif (
+                node_type == NodeType.START.value
+                or node_iteration_id is not None
+                and iteration_start_node_id == source_node.get("id")
+            ):
                 start_node_id = source_node_id
                 start_node_ids.append(start_node_id)
             else:
@@ -462,8 +446,11 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
                 node_execution_info = self._task_state.ran_node_execution_infos[node_id]
 
                 # get chunk node execution
-                route_chunk_node_execution = db.session.query(WorkflowNodeExecution).filter(
-                    WorkflowNodeExecution.id == node_execution_info.workflow_node_execution_id).first()
+                route_chunk_node_execution = (
+                    db.session.query(WorkflowNodeExecution)
+                    .filter(WorkflowNodeExecution.id == node_execution_info.workflow_node_execution_id)
+                    .first()
+                )
 
                 if not route_chunk_node_execution:
                     continue
@@ -474,7 +461,7 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
                     continue
 
                 # get value from outputs
-                text = outputs.get('text')
+                text = outputs.get("text")
 
                 if text:
                     self._task_state.answer += text
@@ -491,12 +478,12 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
         if not event.metadata:
             return False
 
-        if 'node_id' not in event.metadata:
+        if "node_id" not in event.metadata:
             return False
 
-        node_id = event.metadata.get('node_id')
-        node_type = event.metadata.get('node_type')
-        stream_output_value_selector = event.metadata.get('value_selector')
+        node_id = event.metadata.get("node_id")
+        node_type = event.metadata.get("node_type")
+        stream_output_value_selector = event.metadata.get("value_selector")
         if not stream_output_value_selector:
             return False
 
@@ -518,16 +505,19 @@ class WorkflowAppGenerateTaskPipeline(BasedGenerateTaskPipeline, WorkflowCycleMa
         :param graph: graph
         :return:
         """
-        nodes = graph.get('nodes')
+        nodes = graph.get("nodes")
 
-        iteration_ids = [node.get('id') for node in nodes
-                         if node.get('data', {}).get('type') in [
-                             NodeType.ITERATION.value,
-                             NodeType.LOOP.value,
-                        ]]
+        iteration_ids = [
+            node.get("id")
+            for node in nodes
+            if node.get("data", {}).get("type")
+            in [
+                NodeType.ITERATION.value,
+                NodeType.LOOP.value,
+            ]
+        ]
 
         return {
-            iteration_id: [
-                node.get('id') for node in nodes if node.get('data', {}).get('iteration_id') == iteration_id
-            ] for iteration_id in iteration_ids
+            iteration_id: [node.get("id") for node in nodes if node.get("data", {}).get("iteration_id") == iteration_id]
+            for iteration_id in iteration_ids
         }

@@ -29,37 +29,46 @@ class WorkflowCallback(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def on_workflow_node_execute_started(self, node_id: str,
-                                         node_type: NodeType,
-                                         node_data: BaseNodeData,
-                                         node_run_index: int = 1,
-                                         predecessor_node_id: Optional[str] = None) -> None:
+    def on_workflow_node_execute_started(
+        self,
+        node_id: str,
+        node_type: NodeType,
+        node_data: BaseNodeData,
+        node_run_index: int = 1,
+        predecessor_node_id: Optional[str] = None,
+    ) -> None:
         """
         Workflow node execute started
         """
         raise NotImplementedError
 
     @abstractmethod
-    def on_workflow_node_execute_succeeded(self, node_id: str,
-                                           node_type: NodeType,
-                                           node_data: BaseNodeData,
-                                           inputs: Optional[dict] = None,
-                                           process_data: Optional[dict] = None,
-                                           outputs: Optional[dict] = None,
-                                           execution_metadata: Optional[dict] = None) -> None:
+    def on_workflow_node_execute_succeeded(
+        self,
+        node_id: str,
+        node_type: NodeType,
+        node_data: BaseNodeData,
+        inputs: Optional[dict] = None,
+        process_data: Optional[dict] = None,
+        outputs: Optional[dict] = None,
+        execution_metadata: Optional[dict] = None,
+    ) -> None:
         """
         Workflow node execute succeeded
         """
         raise NotImplementedError
 
     @abstractmethod
-    def on_workflow_node_execute_failed(self, node_id: str,
-                                        node_type: NodeType,
-                                        node_data: BaseNodeData,
-                                        error: str,
-                                        inputs: Optional[dict] = None,
-                                        outputs: Optional[dict] = None,
-                                        process_data: Optional[dict] = None) -> None:
+    def on_workflow_node_execute_failed(
+        self,
+        node_id: str,
+        node_type: NodeType,
+        node_data: BaseNodeData,
+        error: str,
+        inputs: Optional[dict] = None,
+        outputs: Optional[dict] = None,
+        process_data: Optional[dict] = None,
+    ) -> None:
         """
         Workflow node execute failed
         """
@@ -71,38 +80,41 @@ class WorkflowCallback(ABC):
         Publish text chunk
         """
         raise NotImplementedError
-    
+
     @abstractmethod
-    def on_workflow_iteration_started(self, 
-                                      node_id: str,
-                                      node_type: NodeType,
-                                      node_run_index: int = 1,
-                                      node_data: Optional[BaseNodeData] = None,
-                                      inputs: Optional[dict] = None,
-                                      predecessor_node_id: Optional[str] = None,
-                                      metadata: Optional[dict] = None) -> None:
+    def on_workflow_iteration_started(
+        self,
+        node_id: str,
+        node_type: NodeType,
+        node_run_index: int = 1,
+        node_data: Optional[BaseNodeData] = None,
+        inputs: Optional[dict] = None,
+        predecessor_node_id: Optional[str] = None,
+        metadata: Optional[dict] = None,
+    ) -> None:
         """
         Publish iteration started
         """
         raise NotImplementedError
 
     @abstractmethod
-    def on_workflow_iteration_next(self, node_id: str, 
-                                   node_type: NodeType,
-                                   index: int, 
-                                   node_run_index: int,
-                                   output: Optional[Any],
-                                   ) -> None:
+    def on_workflow_iteration_next(
+        self,
+        node_id: str,
+        node_type: NodeType,
+        index: int,
+        node_run_index: int,
+        output: Optional[Any],
+    ) -> None:
         """
         Publish iteration next
         """
         raise NotImplementedError
 
     @abstractmethod
-    def on_workflow_iteration_completed(self, node_id: str, 
-                                        node_type: NodeType,
-                                        node_run_index: int,
-                                        outputs: dict) -> None:
+    def on_workflow_iteration_completed(
+        self, node_id: str, node_type: NodeType, node_run_index: int, outputs: dict
+    ) -> None:
         """
         Publish iteration completed
         """

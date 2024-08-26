@@ -47,11 +47,11 @@ class WorkflowAppRunner:
 
         app_record = db.session.query(App).filter(App.id == app_config.app_id).first()
         if not app_record:
-            raise ValueError('App not found')
+            raise ValueError("App not found")
 
         workflow = self.get_workflow(app_model=app_record, workflow_id=app_config.workflow_id)
         if not workflow:
-            raise ValueError('Workflow not initialized')
+            raise ValueError("Workflow not initialized")
 
         inputs = application_generate_entity.inputs
         files = application_generate_entity.files
@@ -62,7 +62,7 @@ class WorkflowAppRunner:
             WorkflowEventTriggerCallback(queue_manager=queue_manager, workflow=workflow)
         ]
 
-        if bool(os.environ.get('DEBUG', 'False').lower() == 'true'):
+        if bool(os.environ.get("DEBUG", "False").lower() == "true"):
             workflow_callbacks.append(WorkflowLoggingCallback())
 
         # Create a variable pool.
@@ -99,14 +99,14 @@ class WorkflowAppRunner:
         """
         app_record = db.session.query(App).filter(App.id == app_id).first()
         if not app_record:
-            raise ValueError('App not found')
+            raise ValueError("App not found")
 
         if not app_record.workflow_id:
-            raise ValueError('Workflow not initialized')
+            raise ValueError("Workflow not initialized")
 
         workflow = self.get_workflow(app_model=app_record, workflow_id=workflow_id)
         if not workflow:
-            raise ValueError('Workflow not initialized')
+            raise ValueError("Workflow not initialized")
 
         workflow_callbacks = [WorkflowEventTriggerCallback(queue_manager=queue_manager, workflow=workflow)]
 

@@ -27,11 +27,7 @@ class EndNode(BaseNode):
             value = variable_pool.get_any(variable_selector.value_selector)
             outputs[variable_selector.variable] = value
 
-        return NodeRunResult(
-            status=WorkflowNodeExecutionStatus.SUCCEEDED,
-            inputs=outputs,
-            outputs=outputs
-        )
+        return NodeRunResult(status=WorkflowNodeExecutionStatus.SUCCEEDED, inputs=outputs, outputs=outputs)
 
     @classmethod
     def extract_generate_nodes(cls, graph: dict, config: dict) -> list[str]:
@@ -54,8 +50,8 @@ class EndNode(BaseNode):
         :param node_data: node data object
         :return:
         """
-        nodes = graph.get('nodes', [])
-        node_mapping = {node.get('id'): node for node in nodes}
+        nodes = graph.get("nodes", [])
+        node_mapping = {node.get("id"): node for node in nodes}
 
         variable_selectors = node_data.outputs
 
@@ -65,10 +61,10 @@ class EndNode(BaseNode):
                 continue
 
             node_id = variable_selector.value_selector[0]
-            if node_id != 'sys' and node_id in node_mapping:
+            if node_id != "sys" and node_id in node_mapping:
                 node = node_mapping[node_id]
-                node_type = node.get('data', {}).get('type')
-                if node_type == NodeType.LLM.value and variable_selector.value_selector[1] == 'text':
+                node_type = node.get("data", {}).get("type")
+                if node_type == NodeType.LLM.value and variable_selector.value_selector[1] == "text":
                     generate_nodes.append(node_id)
 
         # remove duplicates

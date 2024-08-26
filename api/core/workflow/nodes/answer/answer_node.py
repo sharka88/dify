@@ -31,7 +31,7 @@ class AnswerNode(BaseNode):
         # generate routes
         generate_routes = self.extract_generate_route_from_node_data(node_data)
 
-        answer = ''
+        answer = ""
         for part in generate_routes:
             if part.type == "var":
                 part = cast(VarGenerateRouteChunk, part)
@@ -43,12 +43,7 @@ class AnswerNode(BaseNode):
                 part = cast(TextGenerateRouteChunk, part)
                 answer += part.text
 
-        return NodeRunResult(
-            status=WorkflowNodeExecutionStatus.SUCCEEDED,
-            outputs={
-                "answer": answer
-            }
-        )
+        return NodeRunResult(status=WorkflowNodeExecutionStatus.SUCCEEDED, outputs={"answer": answer})
 
     @classmethod
     def extract_generate_route_selectors(cls, config: dict) -> list[GenerateRouteChunk]:
@@ -73,8 +68,7 @@ class AnswerNode(BaseNode):
         variable_selectors = variable_template_parser.extract_variable_selectors()
 
         value_selector_mapping = {
-            variable_selector.variable: variable_selector.value_selector
-            for variable_selector in variable_selectors
+            variable_selector.variable: variable_selector.value_selector for variable_selector in variable_selectors
         }
 
         variable_keys = list(value_selector_mapping.keys())
@@ -88,28 +82,24 @@ class AnswerNode(BaseNode):
 
         template = node_data.answer
         for var in variable_keys:
-            template = template.replace(f'{{{{{var}}}}}', f'Ω{{{{{var}}}}}Ω')
+            template = template.replace(f"{{{{{var}}}}}", f"Ω{{{{{var}}}}}Ω")
 
         generate_routes = []
-        for part in template.split('Ω'):
+        for part in template.split("Ω"):
             if part:
                 if cls._is_variable(part, variable_keys):
-                    var_key = part.replace('Ω', '').replace('{{', '').replace('}}', '')
+                    var_key = part.replace("Ω", "").replace("{{", "").replace("}}", "")
                     value_selector = value_selector_mapping[var_key]
-                    generate_routes.append(VarGenerateRouteChunk(
-                        value_selector=value_selector
-                    ))
+                    generate_routes.append(VarGenerateRouteChunk(value_selector=value_selector))
                 else:
-                    generate_routes.append(TextGenerateRouteChunk(
-                        text=part
-                    ))
+                    generate_routes.append(TextGenerateRouteChunk(text=part))
 
         return generate_routes
 
     @classmethod
     def _is_variable(cls, part, variable_keys):
-        cleaned_part = part.replace('{{', '').replace('}}', '')
-        return part.startswith('{{') and cleaned_part in variable_keys
+        cleaned_part = part.replace("{{", "").replace("}}", "")
+        return part.startswith("{{") and cleaned_part in variable_keys
 
     @classmethod
     def _extract_variable_selector_to_variable_mapping(cls, node_data: BaseNodeData) -> dict[str, list[str]]:
