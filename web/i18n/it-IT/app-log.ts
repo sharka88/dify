@@ -5,9 +5,8 @@ const translation = {
   dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
-      updatedTime: 'Ora di aggiornamento',
-      time: 'Ora di creazione',
-      endUser: 'Utente Finale o Account',
+      time: 'Ora',
+      endUser: 'Utente Finale',
       input: 'Input',
       output: 'Output',
       summary: 'Titolo',
@@ -18,7 +17,7 @@ const translation = {
       status: 'STATO',
       runtime: 'TEMPO DI ESECUZIONE',
       tokens: 'TOKEN',
-      user: 'UTENTE FINALE O ACCOUNT',
+      user: 'UTENTE FINALE',
       version: 'VERSIONE',
     },
     pagination: {
@@ -74,9 +73,6 @@ const translation = {
       annotated: 'Miglioramenti Annotati ({{count}} elementi)',
       not_annotated: 'Non Annotati',
     },
-    sortBy: 'Ordina per:',
-    descending: 'decrescente',
-    ascending: 'crescente',
   },
   workflowTitle: 'Registri del Workflow',
   workflowSubtitle: 'Il registro ha registrato il funzionamento di Automate.',

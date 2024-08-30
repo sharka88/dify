@@ -2,6 +2,9 @@
 import type { FC } from 'react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  RiQuestionLine,
+} from '@remixicon/react'
 import { useContext } from 'use-context-selector'
 import Panel from '../base/feature-panel'
 import ParamConfig from './param-config'
@@ -30,13 +33,11 @@ const ConfigVision: FC = () => {
       title={
         <div className='flex items-center'>
           <div className='mr-1'>{t('appDebug.vision.name')}</div>
-          <Tooltip
-            popupContent={
-              <div className='w-[180px]' >
-                {t('appDebug.vision.description')}
-              </div>
-            }
-          />
+          <Tooltip htmlContent={<div className='w-[180px]' >
+            {t('appDebug.vision.description')}
+          </div>} selector='config-vision-tooltip'>
+            <RiQuestionLine className='w-[14px] h-[14px] text-gray-400' />
+          </Tooltip>
         </div>
       }
       headerRight={

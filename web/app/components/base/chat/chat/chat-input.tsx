@@ -17,7 +17,7 @@ import { TransferMethod } from '../types'
 import { useChatWithHistoryContext } from '../chat-with-history/context'
 import type { Theme } from '../embedded-chatbot/theme/theme-context'
 import { CssTransform } from '../embedded-chatbot/theme/utils'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 import { ToastContext } from '@/app/components/base/toast'
 import useBreakpoints, { MediaType } from '@/hooks/use-breakpoints'
 import VoiceInput from '@/app/components/base/voice-input'
@@ -49,7 +49,6 @@ const ChatInput: FC<ChatInputProps> = ({
   const { t } = useTranslation()
   const { notify } = useContext(ToastContext)
   const [voiceInputShow, setVoiceInputShow] = useState(false)
-  const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const {
     files,
     onUpload,
@@ -90,7 +89,7 @@ const ChatInput: FC<ChatInputProps> = ({
   }
 
   const handleKeyUp = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter') {
+    if (e.code === 'Enter') {
       e.preventDefault()
       // prevent send message when using input method enter
       if (!e.shiftKey && !isUseInputMethod.current)
@@ -100,7 +99,7 @@ const ChatInput: FC<ChatInputProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     isUseInputMethod.current = e.nativeEvent.isComposing
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.code === 'Enter' && !e.shiftKey) {
       setQuery(query.replace(/\n$/, ''))
       e.preventDefault()
     }
@@ -177,7 +176,6 @@ const ChatInput: FC<ChatInputProps> = ({
             )
           }
           <Textarea
-            ref={textAreaRef}
             className={`
               block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
               ${visionConfig?.enabled && 'pl-12'}
@@ -220,7 +218,7 @@ const ChatInput: FC<ChatInputProps> = ({
             {isMobile
               ? sendBtn
               : (
-                <Tooltip
+                <TooltipPlus
                   popupContent={
                     <div>
                       <div>{t('common.operation.send')} Enter</div>
@@ -229,17 +227,14 @@ const ChatInput: FC<ChatInputProps> = ({
                   }
                 >
                   {sendBtn}
-                </Tooltip>
+                </TooltipPlus>
               )}
           </div>
           {
             voiceInputShow && (
               <VoiceInput
                 onCancel={() => setVoiceInputShow(false)}
-                onConverted={(text) => {
-                  setQuery(text)
-                  textAreaRef.current?.focus()
-                }}
+                onConverted={text => setQuery(text)}
               />
             )
           }

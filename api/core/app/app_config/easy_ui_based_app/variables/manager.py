@@ -1,6 +1,6 @@
 import re
 
-from core.app.app_config.entities import ExternalDataVariableEntity, VariableEntity, VariableEntityType
+from core.app.app_config.entities import ExternalDataVariableEntity, VariableEntity
 from core.external_data_tool.factory import ExternalDataToolFactory
 
 
@@ -13,7 +13,7 @@ class BasicVariablesConfigManager:
         :param config: model config args
         """
         external_data_variables = []
-        variable_entities = []
+        variables = []
 
         # old external_data_tools
         external_data_tools = config.get('external_data_tools', [])
@@ -30,41 +30,50 @@ class BasicVariablesConfigManager:
             )
 
         # variables and external_data_tools
-        for variables in config.get('user_input_form', []):
-            variable_type = list(variables.keys())[0]
-            if variable_type == VariableEntityType.EXTERNAL_DATA_TOOL:
-                variable = variables[variable_type]
-                if 'config' not in variable:
+        for variable in config.get('user_input_form', []):
+            typ = list(variable.keys())[0]
+            if typ == 'external_data_tool':
+                val = variable[typ]
+                if 'config' not in val:
                     continue
 
                 external_data_variables.append(
                     ExternalDataVariableEntity(
-                        variable=variable['variable'],
-                        type=variable['type'],
-                        config=variable['config']
+                        variable=val['variable'],
+                        type=val['type'],
+                        config=val['config']
                     )
                 )
-            elif variable_type in [
-                VariableEntityType.TEXT_INPUT,
-                VariableEntityType.PARAGRAPH,
-                VariableEntityType.NUMBER,
-                VariableEntityType.SELECT,
+            elif typ in [
+                VariableEntity.Type.TEXT_INPUT.value,
+                VariableEntity.Type.PARAGRAPH.value,
+                VariableEntity.Type.NUMBER.value,
             ]:
-                variable = variables[variable_type]
-                variable_entities.append(
+                variables.append(
                     VariableEntity(
-                        type=variable_type,
-                        variable=variable.get('variable'),
-                        description=variable.get('description'),
-                        label=variable.get('label'),
-                        required=variable.get('required', False),
-                        max_length=variable.get('max_length'),
-                        options=variable.get('options'),
-                        default=variable.get('default'),
+                        type=VariableEntity.Type.value_of(typ),
+                        variable=variable[typ].get('variable'),
+                        description=variable[typ].get('description'),
+                        label=variable[typ].get('label'),
+                        required=variable[typ].get('required', False),
+                        max_length=variable[typ].get('max_length'),
+                        default=variable[typ].get('default'),
+                    )
+                )
+            elif typ == VariableEntity.Type.SELECT.value:
+                variables.append(
+                    VariableEntity(
+                        type=VariableEntity.Type.SELECT,
+                        variable=variable[typ].get('variable'),
+                        description=variable[typ].get('description'),
+                        label=variable[typ].get('label'),
+                        required=variable[typ].get('required', False),
+                        options=variable[typ].get('options'),
+                        default=variable[typ].get('default'),
                     )
                 )
 
-        return variable_entities, external_data_variables
+        return variables, external_data_variables
 
     @classmethod
     def validate_and_set_defaults(cls, tenant_id: str, config: dict) -> tuple[dict, list[str]]:

@@ -3,9 +3,8 @@ from typing import Any, Optional
 
 from pydantic import BaseModel
 
-from core.file.file_obj import FileExtraConfig
 from core.model_runtime.entities.message_entities import PromptMessageRole
-from models import AppMode
+from models.model import AppMode
 
 
 class ModelConfigEntity(BaseModel):
@@ -82,28 +81,42 @@ class PromptTemplateEntity(BaseModel):
     advanced_completion_prompt_template: Optional[AdvancedCompletionPromptTemplateEntity] = None
 
 
-class VariableEntityType(str, Enum):
-    TEXT_INPUT = "text-input"
-    SELECT = "select"
-    PARAGRAPH = "paragraph"
-    NUMBER = "number"
-    EXTERNAL_DATA_TOOL = "external-data-tool"
-
-
 class VariableEntity(BaseModel):
     """
     Variable Entity.
     """
+    class Type(Enum):
+        TEXT_INPUT = 'text-input'
+        SELECT = 'select'
+        PARAGRAPH = 'paragraph'
+        NUMBER = 'number'
+
+        @classmethod
+        def value_of(cls, value: str) -> 'VariableEntity.Type':
+            """
+            Get value of given mode.
+
+            :param value: mode value
+            :return: mode
+            """
+            for mode in cls:
+                if mode.value == value:
+                    return mode
+            raise ValueError(f'invalid variable type value {value}')
 
     variable: str
     label: str
     description: Optional[str] = None
-    type: VariableEntityType
+    type: Type
     required: bool = False
     max_length: Optional[int] = None
     options: Optional[list[str]] = None
     default: Optional[str] = None
     hint: Optional[str] = None
+
+    @property
+    def name(self) -> str:
+        return self.variable
 
 
 class ExternalDataVariableEntity(BaseModel):
@@ -187,6 +200,11 @@ class TracingConfigEntity(BaseModel):
     tracing_provider: str
 
 
+class FileExtraConfig(BaseModel):
+    """
+    File Upload Entity.
+    """
+    image_config: Optional[dict[str, Any]] = None
 
 
 class AppAdditionalFeatures(BaseModel):

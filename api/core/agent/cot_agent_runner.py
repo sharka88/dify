@@ -292,8 +292,6 @@ class CotAgentRunner(BaseAgentRunner, ABC):
         handle invoke action
         :param action: action
         :param tool_instances: tool instances
-        :param message_file_ids: message file ids
-        :param trace_manager: trace manager
         :return: observation, meta
         """
         # action is tool call, invoke tool

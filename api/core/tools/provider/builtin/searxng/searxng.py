@@ -17,7 +17,8 @@ class SearXNGProvider(BuiltinToolProviderController):
                 tool_parameters={
                     "query": "SearXNG",
                     "limit": 1,
-                    "search_type": "general"
+                    "search_type": "page",
+                    "result_type": "link"
                 },
             )
         except Exception as e:

@@ -1,5 +1,4 @@
 import type { Locale } from '@/i18n'
-import type { AppIconType } from '@/types/app'
 
 export type ResponseHolder = {}
 
@@ -14,10 +13,8 @@ export type SiteInfo = {
   title: string
   chat_color_theme?: string
   chat_color_theme_inverted?: boolean
-  icon_type?: AppIconType | null
   icon?: string
-  icon_background?: string | null
-  icon_url?: string | null
+  icon_background?: string
   description?: string
   default_language?: Locale
   prompt_public?: boolean

@@ -4,9 +4,8 @@ const translation = {
   dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
-      updatedTime: 'Aktualisierungszeit',
-      time: 'Erstellungszeit',
-      endUser: 'Endbenutzer oder Konto',
+      time: 'Zeit',
+      endUser: 'Endbenutzer',
       input: 'Eingabe',
       output: 'Ausgabe',
       summary: 'Titel',
@@ -64,9 +63,6 @@ const translation = {
       annotated: 'Markierte Verbesserungen ({{count}} Elemente)',
       not_annotated: 'Nicht annotiert',
     },
-    sortBy: 'Sortieren nach:',
-    descending: 'absteigend',
-    ascending: 'aufsteigend',
   },
   workflowTitle: 'Workflow-Protokolle',
   workflowSubtitle: 'Das Protokoll hat den Vorgang von Automate aufgezeichnet.',

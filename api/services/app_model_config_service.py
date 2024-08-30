@@ -5,6 +5,7 @@ from models.model import AppMode
 
 
 class AppModelConfigService:
+
     @classmethod
     def validate_configuration(cls, tenant_id: str, config: dict, app_mode: AppMode) -> dict:
         if app_mode == AppMode.CHAT:

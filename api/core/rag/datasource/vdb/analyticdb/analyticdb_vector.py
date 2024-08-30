@@ -65,15 +65,8 @@ class AnalyticdbVector(BaseVector):
         AnalyticdbVector._init = True
 
     def _initialize(self) -> None:
-        cache_key = f"vector_indexing_{self.config.instance_id}"
-        lock_name = f"{cache_key}_lock"
-        with redis_client.lock(lock_name, timeout=20):
-            collection_exist_cache_key = f"vector_indexing_{self.config.instance_id}"
-            if redis_client.get(collection_exist_cache_key):
-                return
-            self._initialize_vector_database()
-            self._create_namespace_if_not_exists()
-            redis_client.set(collection_exist_cache_key, 1, ex=3600)
+        self._initialize_vector_database()
+        self._create_namespace_if_not_exists()
 
     def _initialize_vector_database(self) -> None:
         from alibabacloud_gpdb20160503 import models as gpdb_20160503_models
@@ -292,11 +285,9 @@ class AnalyticdbVector(BaseVector):
         documents = []
         for match in response.body.matches.match:
             if match.score > score_threshold:
-                metadata = json.loads(match.metadata.get("metadata_"))
                 doc = Document(
                     page_content=match.metadata.get("page_content"),
-                    vector=match.metadata.get("vector"),
-                    metadata=metadata,
+                    metadata=json.loads(match.metadata.get("metadata_")),
                 )
                 documents.append(doc)
         return documents
@@ -329,23 +320,7 @@ class AnalyticdbVectorFactory(AbstractVectorFactory):
                 self.gen_index_struct_dict(VectorType.ANALYTICDB, collection_name)
             )
 
-        # handle optional params
-        if dify_config.ANALYTICDB_KEY_ID is None:
-            raise ValueError("ANALYTICDB_KEY_ID should not be None")
-        if dify_config.ANALYTICDB_KEY_SECRET is None:
-            raise ValueError("ANALYTICDB_KEY_SECRET should not be None")
-        if dify_config.ANALYTICDB_REGION_ID is None:
-            raise ValueError("ANALYTICDB_REGION_ID should not be None")
-        if dify_config.ANALYTICDB_INSTANCE_ID is None:
-            raise ValueError("ANALYTICDB_INSTANCE_ID should not be None")
-        if dify_config.ANALYTICDB_ACCOUNT is None:
-            raise ValueError("ANALYTICDB_ACCOUNT should not be None")
-        if dify_config.ANALYTICDB_PASSWORD is None:
-            raise ValueError("ANALYTICDB_PASSWORD should not be None")
-        if dify_config.ANALYTICDB_NAMESPACE is None:
-            raise ValueError("ANALYTICDB_NAMESPACE should not be None")
-        if dify_config.ANALYTICDB_NAMESPACE_PASSWORD is None:
-            raise ValueError("ANALYTICDB_NAMESPACE_PASSWORD should not be None")
+        # TODO handle optional params
         return AnalyticdbVector(
             collection_name,
             AnalyticdbConfig(

@@ -1,6 +1,7 @@
 import type { MouseEvent } from 'react'
 import {
   memo,
+  useCallback,
 } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -9,14 +10,13 @@ import {
   RiHand,
   RiStickyNoteAddLine,
 } from '@remixicon/react'
+import { useKeyPress } from 'ahooks'
 import {
   useNodesReadOnly,
-  useWorkflowMoveMode,
-  useWorkflowOrganize,
+  useSelectionInteractions,
+  useWorkflow,
 } from '../hooks'
-import {
-  ControlMode,
-} from '../types'
+import { getKeyboardKeyCodeBySystem, isEventTargetInputArea } from '../utils'
 import { useStore } from '../store'
 import AddBlock from './add-block'
 import TipPopup from './tip-popup'
@@ -26,13 +26,62 @@ import cn from '@/utils/classnames'
 const Control = () => {
   const { t } = useTranslation()
   const controlMode = useStore(s => s.controlMode)
-  const { handleModePointer, handleModeHand } = useWorkflowMoveMode()
-  const { handleLayout } = useWorkflowOrganize()
+  const setControlMode = useStore(s => s.setControlMode)
+  const { handleLayout } = useWorkflow()
   const { handleAddNote } = useOperator()
   const {
     nodesReadOnly,
     getNodesReadOnly,
   } = useNodesReadOnly()
+  const { handleSelectionCancel } = useSelectionInteractions()
+
+  const handleModePointer = useCallback(() => {
+    if (getNodesReadOnly())
+      return
+    setControlMode('pointer')
+  }, [getNodesReadOnly, setControlMode])
+  const handleModeHand = useCallback(() => {
+    if (getNodesReadOnly())
+      return
+    setControlMode('hand')
+    handleSelectionCancel()
+  }, [getNodesReadOnly, setControlMode, handleSelectionCancel])
+
+  useKeyPress('h', (e) => {
+    if (getNodesReadOnly())
+      return
+
+    if (isEventTargetInputArea(e.target as HTMLElement))
+      return
+
+    e.preventDefault()
+    handleModeHand()
+  }, {
+    exactMatch: true,
+    useCapture: true,
+  })
+
+  useKeyPress('v', (e) => {
+    if (isEventTargetInputArea(e.target as HTMLElement))
+      return
+
+    e.preventDefault()
+    handleModePointer()
+  }, {
+    exactMatch: true,
+    useCapture: true,
+  })
+
+  const goLayout = () => {
+    if (getNodesReadOnly())
+      return
+    handleLayout()
+  }
+
+  useKeyPress(`${getKeyboardKeyCodeBySystem('ctrl')}.o`, (e) => {
+    e.preventDefault()
+    goLayout()
+  }, { exactMatch: true, useCapture: true })
 
   const addNote = (e: MouseEvent<HTMLDivElement>) => {
     if (getNodesReadOnly())
@@ -61,7 +110,7 @@ const Control = () => {
         <div
           className={cn(
             'flex items-center justify-center mr-[1px] w-8 h-8 rounded-lg cursor-pointer',
-            controlMode === ControlMode.Pointer ? 'bg-primary-50 text-primary-600' : 'hover:bg-black/5 hover:text-gray-700',
+            controlMode === 'pointer' ? 'bg-primary-50 text-primary-600' : 'hover:bg-black/5 hover:text-gray-700',
             `${nodesReadOnly && '!cursor-not-allowed opacity-50'}`,
           )}
           onClick={handleModePointer}
@@ -73,7 +122,7 @@ const Control = () => {
         <div
           className={cn(
             'flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer',
-            controlMode === ControlMode.Hand ? 'bg-primary-50 text-primary-600' : 'hover:bg-black/5 hover:text-gray-700',
+            controlMode === 'hand' ? 'bg-primary-50 text-primary-600' : 'hover:bg-black/5 hover:text-gray-700',
             `${nodesReadOnly && '!cursor-not-allowed opacity-50'}`,
           )}
           onClick={handleModeHand}
@@ -88,7 +137,7 @@ const Control = () => {
             'flex items-center justify-center w-8 h-8 rounded-lg hover:bg-black/5 hover:text-gray-700 cursor-pointer',
             `${nodesReadOnly && '!cursor-not-allowed opacity-50'}`,
           )}
-          onClick={handleLayout}
+          onClick={goLayout}
         >
           <RiFunctionAddLine className='w-4 h-4' />
         </div>

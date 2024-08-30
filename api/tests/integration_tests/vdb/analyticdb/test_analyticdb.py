@@ -26,7 +26,6 @@ class AnalyticdbVectorTest(AbstractVectorTest):
     def run_all_tests(self):
         self.vector.delete()
         return super().run_all_tests()
-
-
+    
 def test_chroma_vector(setup_mock_redis):
     AnalyticdbVectorTest().run_all_tests()

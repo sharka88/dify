@@ -11,7 +11,7 @@ import type {
 import { BlockEnum } from '@/app/components/workflow/types'
 import PromptEditor from '@/app/components/base/prompt-editor'
 import { Variable02 } from '@/app/components/base/icons/src/vender/solid/development'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 
 type Props = {
   instanceId?: string
@@ -26,7 +26,6 @@ type Props = {
   justVar?: boolean
   nodesOutputVars?: NodeOutPutVar[]
   availableNodes?: Node[]
-  insertVarTipToLeft?: boolean
 }
 
 const Editor: FC<Props> = ({
@@ -41,7 +40,6 @@ const Editor: FC<Props> = ({
   readOnly,
   nodesOutputVars,
   availableNodes = [],
-  insertVarTipToLeft,
 }) => {
   const { t } = useTranslation()
 
@@ -108,14 +106,14 @@ const Editor: FC<Props> = ({
         {/* to patch Editor not support dynamic change editable status */}
         {readOnly && <div className='absolute inset-0 z-10'></div>}
         {isFocus && (
-          <div className={cn('absolute z-10', insertVarTipToLeft ? 'top-1.5 left-[-12px]' : ' top-[-9px] right-1')}>
-            <Tooltip
+          <div className='absolute z-10 top-[-9px] right-1'>
+            <TooltipPlus
               popupContent={`${t('workflow.common.insertVarTip')}`}
             >
               <div className='p-0.5 rounded-[5px] shadow-lg cursor-pointer bg-white hover:bg-gray-100 border-[0.5px] border-black/5'>
-                <Variable02 className='w-3.5 h-3.5 text-components-button-secondary-accent-text' />
+                <Variable02 className='w-3.5 h-3.5 text-gray-500' />
               </div>
-            </Tooltip>
+            </TooltipPlus>
           </div>
         )}
       </>

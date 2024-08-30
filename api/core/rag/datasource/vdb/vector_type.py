@@ -15,4 +15,5 @@ class VectorType(str, Enum):
     OPENSEARCH = 'opensearch'
     TENCENT = 'tencent'
     ORACLE = 'oracle'
+    COUCHBASE = 'couchbase'
     ELASTICSEARCH = 'elasticsearch'

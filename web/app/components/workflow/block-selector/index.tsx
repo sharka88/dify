@@ -5,7 +5,6 @@ import type {
 import {
   memo,
   useCallback,
-  useMemo,
   useState,
 } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -18,7 +17,6 @@ import {
 } from '@remixicon/react'
 import type { BlockEnum, OnSelectBlock } from '../types'
 import Tabs from './tabs'
-import { TabsEnum } from './types'
 import {
   PortalToFollowElem,
   PortalToFollowElemContent,
@@ -68,9 +66,6 @@ const NodeSelector: FC<NodeSelectorProps> = ({
   const handleOpenChange = useCallback((newOpen: boolean) => {
     setLocalOpen(newOpen)
 
-    if (!newOpen)
-      setSearchText('')
-
     if (onOpenChange)
       onOpenChange(newOpen)
   }, [onOpenChange])
@@ -84,19 +79,6 @@ const NodeSelector: FC<NodeSelectorProps> = ({
     handleOpenChange(false)
     onSelect(type, toolDefaultValue)
   }, [handleOpenChange, onSelect])
-
-  const [activeTab, setActiveTab] = useState(noBlocks ? TabsEnum.Tools : TabsEnum.Blocks)
-  const handleActiveTabChange = useCallback((newActiveTab: TabsEnum) => {
-    setActiveTab(newActiveTab)
-  }, [])
-  const searchPlaceholder = useMemo(() => {
-    if (activeTab === TabsEnum.Blocks)
-      return t('workflow.tabs.searchBlock')
-
-    if (activeTab === TabsEnum.Tools)
-      return t('workflow.tabs.searchTool')
-    return ''
-  }, [activeTab, t])
 
   return (
     <PortalToFollowElem
@@ -138,7 +120,7 @@ const NodeSelector: FC<NodeSelectorProps> = ({
               <input
                 value={searchText}
                 className='grow px-0.5 py-[7px] text-[13px] text-gray-700 bg-transparent appearance-none outline-none caret-primary-600 placeholder:text-gray-400'
-                placeholder={searchPlaceholder}
+                placeholder={t('workflow.tabs.searchBlock') || ''}
                 onChange={e => setSearchText(e.target.value)}
                 autoFocus
               />
@@ -155,8 +137,6 @@ const NodeSelector: FC<NodeSelectorProps> = ({
             </div>
           </div>
           <Tabs
-            activeTab={activeTab}
-            onActiveTabChange={handleActiveTabChange}
             onSelect={handleSelect}
             searchText={searchText}
             availableBlocksTypes={availableBlocksTypes}

@@ -1,8 +1,7 @@
 import enum
 
 from extensions.ext_database import db
-
-from .types import StringUUID
+from models import StringUUID
 
 
 class APIBasedExtensionPoint(enum.Enum):

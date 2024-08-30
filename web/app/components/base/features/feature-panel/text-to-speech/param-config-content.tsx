@@ -2,6 +2,9 @@
 import useSWR from 'swr'
 import produce from 'immer'
 import React, { Fragment } from 'react'
+import {
+  RiQuestionLine,
+} from '@remixicon/react'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from 'react-i18next'
 import { Listbox, Transition } from '@headlessui/react'
@@ -71,16 +74,13 @@ const VoiceParamConfig = ({
             <div className='mb-2 flex items-center  space-x-1'>
               <div
                 className='leading-[18px] text-[13px] font-semibold text-gray-800'>{t('appDebug.voice.voiceSettings.language')}</div>
-              <Tooltip
-                popupContent={
-                  <div className='w-[180px]'>
-                    {t('appDebug.voice.voiceSettings.resolutionTooltip').split('\n').map(item => (
-                      <div key={item}>{item}
-                      </div>
-                    ))}
-                  </div>
-                }
-              />
+              <Tooltip htmlContent={<div className='w-[180px]'>
+                {t('appDebug.voice.voiceSettings.resolutionTooltip').split('\n').map(item => (
+                  <div key={item}>{item}</div>
+                ))}
+              </div>} selector='config-resolution-tooltip'>
+                <RiQuestionLine className='w-[14px] h-[14px] text-gray-400'/>
+              </Tooltip>
             </div>
             <Listbox
               value={languageItem}

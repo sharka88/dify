@@ -2,6 +2,7 @@ import base64
 
 from extensions.ext_database import db
 from libs import rsa
+from models.account import Tenant
 
 
 def obfuscated_token(token: str):
@@ -13,7 +14,6 @@ def obfuscated_token(token: str):
 
 
 def encrypt_token(tenant_id: str, token: str):
-    from models.account import Tenant
     if not (tenant := db.session.query(Tenant).filter(Tenant.id == tenant_id).first()):
         raise ValueError(f'Tenant with id {tenant_id} not found')
     encrypted_token = rsa.encrypt(token, tenant.encrypt_public_key)

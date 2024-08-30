@@ -11,13 +11,24 @@ from core.model_runtime.entities.message_entities import (
     UserPromptMessage,
 )
 from core.model_runtime.errors.invoke import (
+    InvokeAuthorizationError,
+    InvokeBadRequestError,
+    InvokeConnectionError,
     InvokeError,
+    InvokeRateLimitError,
+    InvokeServerUnavailableError,
 )
 from core.model_runtime.errors.validate import CredentialsValidateFailedError
 from core.model_runtime.model_providers.__base.large_language_model import LargeLanguageModel
-from core.model_runtime.model_providers.wenxin._common import BaiduAccessToken
-from core.model_runtime.model_providers.wenxin.llm.ernie_bot import ErnieBotModel, ErnieMessage
-from core.model_runtime.model_providers.wenxin.wenxin_errors import invoke_error_mapping
+from core.model_runtime.model_providers.wenxin.llm.ernie_bot import BaiduAccessToken, ErnieBotModel, ErnieMessage
+from core.model_runtime.model_providers.wenxin.llm.ernie_bot_errors import (
+    BadRequestError,
+    InsufficientAccountBalance,
+    InternalServerError,
+    InvalidAPIKeyError,
+    InvalidAuthenticationError,
+    RateLimitReachedError,
+)
 
 ERNIE_BOT_BLOCK_MODE_PROMPT = """You should always follow the instructions and output a valid {{block}} object.
 The structure of the {{block}} object you can found in the instructions, use {"answer": "$your_answer"} as the default structure
@@ -129,7 +140,7 @@ class ErnieBotLargeLanguageModel(LargeLanguageModel):
         api_key = credentials['api_key']
         secret_key = credentials['secret_key']
         try:
-            BaiduAccessToken.get_access_token(api_key, secret_key)
+            BaiduAccessToken._get_access_token(api_key, secret_key)
         except Exception as e:
             raise CredentialsValidateFailedError(f'Credentials validation failed: {e}')
 
@@ -243,4 +254,22 @@ class ErnieBotLargeLanguageModel(LargeLanguageModel):
 
         :return: Invoke error mapping
         """
-        return invoke_error_mapping()
+        return {
+            InvokeConnectionError: [
+            ],
+            InvokeServerUnavailableError: [
+                InternalServerError
+            ],
+            InvokeRateLimitError: [
+                RateLimitReachedError
+            ],
+            InvokeAuthorizationError: [
+                InvalidAuthenticationError,
+                InsufficientAccountBalance,
+                InvalidAPIKeyError,
+            ],
+            InvokeBadRequestError: [
+                BadRequestError,
+                KeyError
+            ]
+        }

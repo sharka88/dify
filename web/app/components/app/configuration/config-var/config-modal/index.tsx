@@ -42,19 +42,18 @@ const ConfigModal: FC<IConfigModalProps> = ({
   const { type, label, variable, options, max_length } = tempPayload
 
   const isStringInput = type === InputVarType.textInput || type === InputVarType.paragraph
-  const checkVariableName = useCallback((value: string) => {
-    const { isValid, errorMessageKey } = checkKeys([value], false)
-    if (!isValid) {
-      Toast.notify({
-        type: 'error',
-        message: t(`appDebug.varKeyError.${errorMessageKey}`, { key: t('appDebug.variableConig.varName') }),
-      })
-      return false
-    }
-    return true
-  }, [t])
   const handlePayloadChange = useCallback((key: string) => {
     return (value: any) => {
+      if (key === 'variable') {
+        const { isValid, errorKey, errorMessageKey } = checkKeys([value], true)
+        if (!isValid) {
+          Toast.notify({
+            type: 'error',
+            message: t(`appDebug.varKeyError.${errorMessageKey}`, { key: errorKey }),
+          })
+          return
+        }
+      }
       setTempPayload((prev) => {
         const newPayload = {
           ...prev,
@@ -64,20 +63,19 @@ const ConfigModal: FC<IConfigModalProps> = ({
         return newPayload
       })
     }
-  }, [])
+  }, [t])
 
   const handleVarKeyBlur = useCallback((e: any) => {
-    const varName = e.target.value
-    if (!checkVariableName(varName) || tempPayload.label)
+    if (tempPayload.label)
       return
 
     setTempPayload((prev) => {
       return {
         ...prev,
-        label: varName,
+        label: e.target.value,
       }
     })
-  }, [checkVariableName, tempPayload.label])
+  }, [tempPayload])
 
   const handleConfirm = () => {
     const moreInfo = tempPayload.variable === payload?.variable
@@ -86,11 +84,10 @@ const ConfigModal: FC<IConfigModalProps> = ({
         type: ChangeType.changeVarName,
         payload: { beforeKey: payload?.variable || '', afterKey: tempPayload.variable },
       }
-
-    const isVariableNameValid = checkVariableName(tempPayload.variable)
-    if (!isVariableNameValid)
+    if (!tempPayload.variable) {
+      Toast.notify({ type: 'error', message: t('appDebug.variableConig.errorMsg.varNameRequired') })
       return
-
+    }
     // TODO: check if key already exists. should the consider the edit case
     // if (varKeys.map(key => key?.trim()).includes(tempPayload.variable.trim())) {
     //   Toast.notify({

@@ -42,7 +42,8 @@ const Header: FC<IResultHeaderProps> = ({
 
         {showFeedback && feedback.rating && feedback.rating === 'like' && (
           <Tooltip
-            popupContent="Undo Great Rating"
+            selector="undo-feedback-like"
+            content="Undo Great Rating"
           >
             <div
               onClick={() => {
@@ -58,7 +59,8 @@ const Header: FC<IResultHeaderProps> = ({
 
         {showFeedback && feedback.rating && feedback.rating === 'dislike' && (
           <Tooltip
-            popupContent="Undo Undesirable Response"
+            selector="undo-feedback-dislike"
+            content="Undo Undesirable Response"
           >
             <div
               onClick={() => {
@@ -75,8 +77,8 @@ const Header: FC<IResultHeaderProps> = ({
         {showFeedback && !feedback.rating && (
           <div className='flex rounded-lg border border-gray-200 p-[1px] space-x-1'>
             <Tooltip
-              popupContent="Great Rating"
-              needsDelay={false}
+              selector="feedback-like"
+              content="Great Rating"
             >
               <div
                 onClick={() => {
@@ -89,8 +91,8 @@ const Header: FC<IResultHeaderProps> = ({
               </div>
             </Tooltip>
             <Tooltip
-              popupContent="Undesirable Response"
-              needsDelay={false}
+              selector="feedback-dislike"
+              content="Undesirable Response"
             >
               <div
                 onClick={() => {

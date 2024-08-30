@@ -11,11 +11,13 @@ class ToolCommonService:
     @staticmethod
     def list_tool_providers(user_id: str, tenant_id: str, typ: UserToolProviderTypeLiteral = None):
         """
-        list tool providers
+            list tool providers
 
-        :return: the list of tool providers
+            :return: the list of tool providers
         """
-        providers = ToolManager.user_list_providers(user_id, tenant_id, typ)
+        providers = ToolManager.user_list_providers(
+            user_id, tenant_id, typ
+        )
 
         # add icon
         for provider in providers:
@@ -24,3 +26,4 @@ class ToolCommonService:
         result = [provider.to_dict() for provider in providers]
 
         return result
+    

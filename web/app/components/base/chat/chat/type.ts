@@ -13,14 +13,8 @@ export type Feedbacktype = {
   content?: string | null
 }
 
-export type FeedbackFunc = (
-  messageId: string,
-  feedback: Feedbacktype
-) => Promise<any>
-export type SubmitAnnotationFunc = (
-  messageId: string,
-  content: string
-) => Promise<any>
+export type FeedbackFunc = (messageId: string, feedback: Feedbacktype) => Promise<any>
+export type SubmitAnnotationFunc = (messageId: string, content: string) => Promise<any>
 
 export type DisplayScene = 'web' | 'console'
 
@@ -97,20 +91,18 @@ export type IChatItem = {
   input?: any
 }
 
-export type Metadata = {
-  retriever_resources?: CitationItem[]
-  annotation_reply: {
-    id: string
-    account: {
-      id: string
-      name: string
-    }
-  }
-}
-
 export type MessageEnd = {
   id: string
-  metadata: Metadata
+  metadata: {
+    retriever_resources?: CitationItem[]
+    annotation_reply: {
+      id: string
+      account: {
+        id: string
+        name: string
+      }
+    }
+  }
 }
 
 export type MessageReplace = {

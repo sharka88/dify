@@ -1,5 +1,8 @@
 import type { FC } from 'react'
 import { useEffect, useRef, useState } from 'react'
+import {
+  RiQuestionLine,
+} from '@remixicon/react'
 import type { ModelParameterRule } from '../declarations'
 import { useLanguage } from '../hooks'
 import { isNullOrUndefined } from '../utils'
@@ -38,7 +41,7 @@ const ParameterItem: FC<ParameterItemProps> = ({
 
     if (parameterRule.type === 'int' || parameterRule.type === 'float')
       defaultValue = isNullOrUndefined(parameterRule.default) ? (parameterRule.min || 0) : parameterRule.default
-    else if (parameterRule.type === 'string' || parameterRule.type === 'text')
+    else if (parameterRule.type === 'string')
       defaultValue = parameterRule.options?.length ? (parameterRule.default || '') : (parameterRule.default || '')
     else if (parameterRule.type === 'boolean')
       defaultValue = !isNullOrUndefined(parameterRule.default) ? parameterRule.default : false
@@ -97,7 +100,7 @@ const ParameterItem: FC<ParameterItemProps> = ({
     handleInputChange(v === 1)
   }
 
-  const handleStringInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleStringInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleInputChange(e.target.value)
   }
 
@@ -187,16 +190,6 @@ const ParameterItem: FC<ParameterItemProps> = ({
       )
     }
 
-    if (parameterRule.type === 'text') {
-      return (
-        <textarea
-          className='w-full h-20 ml-4 px-1 rounded-lg bg-gray-100 outline-none text-[12px] text-gray-900'
-          value={renderValue as string}
-          onChange={handleStringInputChange}
-        />
-      )
-    }
-
     if (parameterRule.type === 'string' && !!parameterRule?.options?.length) {
       return (
         <SimpleSelect
@@ -238,18 +231,18 @@ const ParameterItem: FC<ParameterItemProps> = ({
           {
             parameterRule.help && (
               <Tooltip
-                popupContent={(
+                selector={`model-parameter-rule-${parameterRule.name}`}
+                htmlContent={(
                   <div className='w-[200px] whitespace-pre-wrap'>{parameterRule.help[language] || parameterRule.help.en_US}</div>
                 )}
-                popupClassName='mr-1'
-                triggerClassName='mr-1 w-4 h-4 shrink-0'
-              />
+              >
+                <RiQuestionLine className='mr-1.5 w-3.5 h-3.5 text-gray-400' />
+              </Tooltip>
             )
           }
           {
             !parameterRule.required && parameterRule.name !== 'stop' && (
               <Switch
-                className='mr-1'
                 defaultValue={!isNullOrUndefined(value)}
                 onChange={handleSwitch}
                 size='md'

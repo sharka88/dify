@@ -2,29 +2,25 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { RiCloseLine } from '@remixicon/react'
-import AppIconPicker from '../../base/app-icon-picker'
 import Modal from '@/app/components/base/modal'
 import Button from '@/app/components/base/button'
 import Toast from '@/app/components/base/toast'
 import AppIcon from '@/app/components/base/app-icon'
+import EmojiPicker from '@/app/components/base/emoji-picker'
 import { useProviderContext } from '@/context/provider-context'
 import AppsFull from '@/app/components/billing/apps-full-in-dialog'
-import type { AppIconType } from '@/types/app'
 
 export type CreateAppModalProps = {
   show: boolean
   isEditModal?: boolean
   appName: string
   appDescription: string
-  appIconType: AppIconType | null
   appIcon: string
-  appIconBackground?: string | null
-  appIconUrl?: string | null
+  appIconBackground: string
   onConfirm: (info: {
     name: string
-    icon_type: AppIconType
     icon: string
-    icon_background?: string
+    icon_background: string
     description: string
   }) => Promise<void>
   onHide: () => void
@@ -33,10 +29,8 @@ export type CreateAppModalProps = {
 const CreateAppModal = ({
   show = false,
   isEditModal = false,
-  appIconType,
-  appIcon: _appIcon,
+  appIcon,
   appIconBackground,
-  appIconUrl,
   appName,
   appDescription,
   onConfirm,
@@ -45,12 +39,8 @@ const CreateAppModal = ({
   const { t } = useTranslation()
 
   const [name, setName] = React.useState(appName)
-  const [appIcon, setAppIcon] = useState(
-    () => appIconType === 'image'
-      ? { type: 'image' as const, fileId: _appIcon, url: appIconUrl }
-      : { type: 'emoji' as const, icon: _appIcon, background: appIconBackground },
-  )
-  const [showAppIconPicker, setShowAppIconPicker] = useState(false)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [emoji, setEmoji] = useState({ icon: appIcon, icon_background: appIconBackground })
   const [description, setDescription] = useState(appDescription || '')
 
   const { plan, enableBilling } = useProviderContext()
@@ -63,9 +53,7 @@ const CreateAppModal = ({
     }
     onConfirm({
       name,
-      icon_type: appIcon.type,
-      icon: appIcon.type === 'emoji' ? appIcon.icon : appIcon.fileId,
-      icon_background: appIcon.type === 'emoji' ? appIcon.background! : undefined,
+      ...emoji,
       description,
     })
     onHide()
@@ -92,15 +80,7 @@ const CreateAppModal = ({
           <div className='pt-2'>
             <div className='py-2 text-sm font-medium leading-[20px] text-gray-900'>{t('app.newApp.captionName')}</div>
             <div className='flex items-center justify-between space-x-2'>
-              <AppIcon
-                size='large'
-                onClick={() => { setShowAppIconPicker(true) }}
-                className='cursor-pointer'
-                iconType={appIcon.type}
-                icon={appIcon.type === 'image' ? appIcon.fileId : appIcon.icon}
-                background={appIcon.type === 'image' ? undefined : appIcon.background}
-                imageUrl={appIcon.type === 'image' ? appIcon.url : undefined}
-              />
+              <AppIcon size='large' onClick={() => { setShowEmojiPicker(true) }} className='cursor-pointer' icon={emoji.icon} background={emoji.icon_background} />
               <input
                 value={name}
                 onChange={e => setName(e.target.value)}
@@ -126,19 +106,18 @@ const CreateAppModal = ({
           <Button className='w-24' onClick={onHide}>{t('common.operation.cancel')}</Button>
         </div>
       </Modal>
-      {showAppIconPicker && <AppIconPicker
-        onSelect={(payload) => {
-          setAppIcon(payload)
-          setShowAppIconPicker(false)
+      {showEmojiPicker && <EmojiPicker
+        onSelect={(icon, icon_background) => {
+          setEmoji({ icon, icon_background })
+          setShowEmojiPicker(false)
         }}
         onClose={() => {
-          setAppIcon(appIconType === 'image'
-            ? { type: 'image' as const, url: appIconUrl, fileId: _appIcon }
-            : { type: 'emoji' as const, icon: _appIcon, background: appIconBackground })
-          setShowAppIconPicker(false)
+          setEmoji({ icon: appIcon, icon_background: appIconBackground })
+          setShowEmojiPicker(false)
         }}
       />}
     </>
+
   )
 }
 

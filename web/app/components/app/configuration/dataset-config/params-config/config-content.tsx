@@ -5,6 +5,7 @@ import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   RiAlertFill,
+  RiQuestionLine,
 } from '@remixicon/react'
 import WeightedScore from './weighted-score'
 import TopKItem from '@/app/components/base/param-item/top-k-item'
@@ -22,7 +23,7 @@ import ModelSelector from '@/app/components/header/account-setting/model-provide
 import { useModelListAndDefaultModelAndCurrentProviderAndModel } from '@/app/components/header/account-setting/model-provider-page/hooks'
 import type { ModelConfig } from '@/app/components/workflow/types'
 import ModelParameterModal from '@/app/components/header/account-setting/model-provider-page/model-parameter-modal'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 import { ModelTypeEnum } from '@/app/components/header/account-setting/model-provider-page/declarations'
 import type {
   DataSet,
@@ -172,7 +173,7 @@ const ConfigContent: FC<Props> = ({
           title={(
             <div className='flex items-center'>
               {t('appDebug.datasetConfig.retrieveOneWay.title')}
-              <Tooltip
+              <TooltipPlus
                 popupContent={(
                   <div className='w-[320px]'>
                     {t('dataset.nTo1RetrievalLegacy')}
@@ -180,7 +181,7 @@ const ConfigContent: FC<Props> = ({
                 )}
               >
                 <div className='ml-1 flex items-center px-[5px] h-[18px] rounded-[5px] border border-text-accent-secondary system-2xs-medium-uppercase text-text-accent-secondary'>legacy</div>
-              </Tooltip>
+              </TooltipPlus>
             </div>
           )}
           description={t('appDebug.datasetConfig.retrieveOneWay.description')}
@@ -249,15 +250,12 @@ const ConfigContent: FC<Props> = ({
                       onClick={() => handleRerankModeChange(option.value)}
                     >
                       <div className='truncate'>{option.label}</div>
-                      <Tooltip
-                        popupContent={
-                          <div className='w-[200px]'>
-                            {option.tips}
-                          </div>
-                        }
-                        popupClassName='ml-0.5'
-                        triggerClassName='ml-0.5 w-3.5 h-3.5'
-                      />
+                      <TooltipPlus
+                        popupContent={<div className='w-[200px]'>{option.tips}</div>}
+                        hideArrow
+                      >
+                        <RiQuestionLine className='ml-0.5 w-3.5 h-4.5 text-text-quaternary' />
+                      </TooltipPlus>
                     </div>
                   ))
                 }
@@ -283,15 +281,9 @@ const ConfigContent: FC<Props> = ({
                     )
                   }
                   <div className='ml-2 leading-[32px] text-[13px] font-medium text-gray-900'>{t('common.modelProvider.rerankModel.key')}</div>
-                  <Tooltip
-                    popupContent={
-                      <div className="w-[200px]">
-                        {t('common.modelProvider.rerankModel.tip')}
-                      </div>
-                    }
-                    popupClassName='ml-0.5'
-                    triggerClassName='ml-0.5 w-3.5 h-3.5'
-                  />
+                  <TooltipPlus popupContent={<div className="w-[200px]">{t('common.modelProvider.rerankModel.tip')}</div>}>
+                    <RiQuestionLine className='ml-0.5 w-[14px] h-[14px] text-gray-400' />
+                  </TooltipPlus>
                 </div>
                 <div>
                   <ModelSelector
@@ -369,9 +361,11 @@ const ConfigContent: FC<Props> = ({
         <div className='mt-4'>
           <div className='flex items-center space-x-0.5'>
             <div className='leading-[32px] text-[13px] font-medium text-gray-900'>{t('common.modelProvider.systemReasoningModel.key')}</div>
-            <Tooltip
+            <TooltipPlus
               popupContent={t('common.modelProvider.systemReasoningModel.tip')}
-            />
+            >
+              <RiQuestionLine className='w-3.5 h-4.5 text-gray-400' />
+            </TooltipPlus>
           </div>
           <ModelParameterModal
             isInWorkflow={isInWorkflow}

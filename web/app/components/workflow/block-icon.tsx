@@ -3,7 +3,6 @@ import { memo } from 'react'
 import { BlockEnum } from './types'
 import {
   Answer,
-  Assigner,
   Code,
   End,
   Home,
@@ -44,7 +43,6 @@ const getIcon = (type: BlockEnum, className: string) => {
     [BlockEnum.TemplateTransform]: <TemplatingTransform className={className} />,
     [BlockEnum.VariableAssigner]: <VariableX className={className} />,
     [BlockEnum.VariableAggregator]: <VariableX className={className} />,
-    [BlockEnum.Assigner]: <Assigner className={className} />,
     [BlockEnum.Tool]: <VariableX className={className} />,
     [BlockEnum.Iteration]: <Iteration className={className} />,
     [BlockEnum.ParameterExtractor]: <ParameterExtractor className={className} />,
@@ -64,7 +62,6 @@ const ICON_CONTAINER_BG_COLOR_MAP: Record<string, string> = {
   [BlockEnum.TemplateTransform]: 'bg-[#2E90FA]',
   [BlockEnum.VariableAssigner]: 'bg-[#2E90FA]',
   [BlockEnum.VariableAggregator]: 'bg-[#2E90FA]',
-  [BlockEnum.Assigner]: 'bg-[#2E90FA]',
   [BlockEnum.ParameterExtractor]: 'bg-[#2E90FA]',
 }
 const BlockIcon: FC<BlockIconProps> = ({

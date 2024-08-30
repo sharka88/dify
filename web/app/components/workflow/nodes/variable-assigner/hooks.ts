@@ -143,7 +143,6 @@ export const useGetAvailableVars = () => {
         beforeNodes: uniqBy(availableNodes, 'id').filter(node => node.id !== nodeId),
         isChatMode,
         hideEnv,
-        hideChatVar: hideEnv,
         filterVar,
       })
         .map(node => ({

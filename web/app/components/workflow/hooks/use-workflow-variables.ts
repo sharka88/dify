@@ -12,7 +12,6 @@ import type {
 export const useWorkflowVariables = () => {
   const { t } = useTranslation()
   const environmentVariables = useStore(s => s.environmentVariables)
-  const conversationVariables = useStore(s => s.conversationVariables)
 
   const getNodeAvailableVars = useCallback(({
     parentNode,
@@ -20,14 +19,12 @@ export const useWorkflowVariables = () => {
     isChatMode,
     filterVar,
     hideEnv,
-    hideChatVar,
   }: {
     parentNode?: Node | null
     beforeNodes: Node[]
     isChatMode: boolean
     filterVar: (payload: Var, selector: ValueSelector) => boolean
     hideEnv?: boolean
-    hideChatVar?: boolean
   }): NodeOutPutVar[] => {
     return toNodeAvailableVars({
       parentNode,
@@ -35,10 +32,9 @@ export const useWorkflowVariables = () => {
       beforeNodes,
       isChatMode,
       environmentVariables: hideEnv ? [] : environmentVariables,
-      conversationVariables: (isChatMode && !hideChatVar) ? conversationVariables : [],
       filterVar,
     })
-  }, [conversationVariables, environmentVariables, t])
+  }, [environmentVariables, t])
 
   const getCurrentVariableType = useCallback(({
     parentNode,
@@ -63,9 +59,8 @@ export const useWorkflowVariables = () => {
       isChatMode,
       isConstant,
       environmentVariables,
-      conversationVariables,
     })
-  }, [conversationVariables, environmentVariables])
+  }, [environmentVariables])
 
   return {
     getNodeAvailableVars,

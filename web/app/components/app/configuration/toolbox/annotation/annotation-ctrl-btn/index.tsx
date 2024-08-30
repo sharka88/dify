@@ -8,7 +8,7 @@ import { MessageCheckRemove, MessageFastPlus } from '@/app/components/base/icons
 import { MessageFast } from '@/app/components/base/icons/src/vender/solid/communication'
 import { Edit04 } from '@/app/components/base/icons/src/vender/line/general'
 import RemoveAnnotationConfirmModal from '@/app/components/app/annotation/remove-annotation-confirm-modal'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 import { addAnnotation, delAnnotation } from '@/service/annotation'
 import Toast from '@/app/components/base/toast'
 import { useProviderContext } from '@/context/provider-context'
@@ -99,9 +99,8 @@ const CacheCtrlBtn: FC<Props> = ({
           )
           : answer
             ? (
-              <Tooltip
-                popupContent={t('appDebug.feature.annotation.add')}
-                needsDelay
+              <TooltipPlus
+                popupContent={t('appDebug.feature.annotation.add') as string}
               >
                 <div
                   className='p-1 rounded-md hover:bg-[#EEF4FF] hover:text-[#444CE7] cursor-pointer'
@@ -109,13 +108,12 @@ const CacheCtrlBtn: FC<Props> = ({
                 >
                   <MessageFastPlus className='w-4 h-4' />
                 </div>
-              </Tooltip>
+              </TooltipPlus>
             )
             : null
         }
-        <Tooltip
-          popupContent={t('appDebug.feature.annotation.edit')}
-          needsDelay
+        <TooltipPlus
+          popupContent={t('appDebug.feature.annotation.edit') as string}
         >
           <div
             className='p-1 cursor-pointer rounded-md hover:bg-black/5'
@@ -123,7 +121,7 @@ const CacheCtrlBtn: FC<Props> = ({
           >
             <Edit04 className='w-4 h-4' />
           </div>
-        </Tooltip>
+        </TooltipPlus>
 
       </div>
       <RemoveAnnotationConfirmModal

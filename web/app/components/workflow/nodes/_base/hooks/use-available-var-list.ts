@@ -7,16 +7,12 @@ import {
 import type { ValueSelector, Var } from '@/app/components/workflow/types'
 type Params = {
   onlyLeafNodeVar?: boolean
-  hideEnv?: boolean
-  hideChatVar?: boolean
   filterVar: (payload: Var, selector: ValueSelector) => boolean
 }
 
 const useAvailableVarList = (nodeId: string, {
   onlyLeafNodeVar,
   filterVar,
-  hideEnv,
-  hideChatVar,
 }: Params = {
   onlyLeafNodeVar: false,
   filterVar: () => true,
@@ -36,8 +32,6 @@ const useAvailableVarList = (nodeId: string, {
     beforeNodes: availableNodes,
     isChatMode,
     filterVar,
-    hideEnv,
-    hideChatVar,
   })
 
   return {

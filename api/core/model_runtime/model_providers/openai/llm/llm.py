@@ -1,4 +1,3 @@
-import json
 import logging
 from collections.abc import Generator
 from typing import Optional, Union, cast
@@ -545,18 +544,13 @@ class OpenAILargeLanguageModel(_CommonOpenAI, LargeLanguageModel):
 
         response_format = model_parameters.get("response_format")
         if response_format:
-            if response_format == "json_schema":
-                json_schema = model_parameters.get("json_schema")
-                if not json_schema:
-                    raise ValueError("Must define JSON Schema when the response format is json_schema")
-                try:
-                    schema = json.loads(json_schema)
-                except:
-                    raise ValueError(f"not currect json_schema format: {json_schema}")
-                model_parameters.pop("json_schema")
-                model_parameters["response_format"] = {"type": "json_schema", "json_schema": schema}
+            if response_format == "json_object":
+                response_format = {"type": "json_object"}
             else:
-                model_parameters["response_format"] = {"type": response_format}
+                response_format = {"type": "text"}
+
+            model_parameters["response_format"] = response_format
+
 
         extra_model_kwargs = {}
 
@@ -928,13 +922,10 @@ class OpenAILargeLanguageModel(_CommonOpenAI, LargeLanguageModel):
                                   tools: Optional[list[PromptMessageTool]] = None) -> int:
         """Calculate num tokens for gpt-3.5-turbo and gpt-4 with tiktoken package.
 
-        Official documentation: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_format_inputs_to_ChatGPT_models.ipynb"""
+        Official documentation: https://github.com/openai/openai-cookbook/blob/
+        main/examples/How_to_format_inputs_to_ChatGPT_models.ipynb"""
         if model.startswith('ft:'):
             model = model.split(':')[1]
-
-        # Currently, we can use gpt4o to calculate chatgpt-4o-latest's token.
-        if model == "chatgpt-4o-latest":
-            model = "gpt-4o"
 
         try:
             encoding = tiktoken.encoding_for_model(model)
@@ -955,7 +946,7 @@ class OpenAILargeLanguageModel(_CommonOpenAI, LargeLanguageModel):
             raise NotImplementedError(
                 f"get_num_tokens_from_messages() is not presently implemented "
                 f"for model {model}."
-                "See https://platform.openai.com/docs/advanced-usage/managing-tokens for "
+                "See https://github.com/openai/openai-python/blob/main/chatml.md for "
                 "information on how messages are converted to tokens."
             )
         num_tokens = 0

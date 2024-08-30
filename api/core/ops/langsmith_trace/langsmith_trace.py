@@ -15,7 +15,6 @@ from core.ops.entities.trace_entity import (
     ModerationTraceInfo,
     SuggestedQuestionTraceInfo,
     ToolTraceInfo,
-    TraceTaskName,
     WorkflowTraceInfo,
 )
 from core.ops.langsmith_trace.entities.langsmith_trace_entity import (
@@ -40,7 +39,9 @@ class LangSmithDataTrace(BaseTraceInstance):
         self.langsmith_key = langsmith_config.api_key
         self.project_name = langsmith_config.project
         self.project_id = None
-        self.langsmith_client = Client(api_key=langsmith_config.api_key, api_url=langsmith_config.endpoint)
+        self.langsmith_client = Client(
+            api_key=langsmith_config.api_key, api_url=langsmith_config.endpoint
+        )
         self.file_base_url = os.getenv("FILES_URL", "http://127.0.0.1:5001")
 
     def trace(self, trace_info: BaseTraceInfo):
@@ -63,7 +64,7 @@ class LangSmithDataTrace(BaseTraceInstance):
         if trace_info.message_id:
             message_run = LangSmithRunModel(
                 id=trace_info.message_id,
-                name=TraceTaskName.MESSAGE_TRACE.value,
+                name=f"message_{trace_info.message_id}",
                 inputs=trace_info.workflow_run_inputs,
                 outputs=trace_info.workflow_run_outputs,
                 run_type=LangSmithRunType.chain,
@@ -72,8 +73,8 @@ class LangSmithDataTrace(BaseTraceInstance):
                 extra={
                     "metadata": trace_info.metadata,
                 },
-                tags=["message", "workflow"],
-                error=trace_info.error,
+                tags=["message"],
+                error=trace_info.error
             )
             self.add_run(message_run)
 
@@ -81,7 +82,7 @@ class LangSmithDataTrace(BaseTraceInstance):
             file_list=trace_info.file_list,
             total_tokens=trace_info.total_tokens,
             id=trace_info.workflow_app_log_id if trace_info.workflow_app_log_id else trace_info.workflow_run_id,
-            name=TraceTaskName.WORKFLOW_TRACE.value,
+            name=f"workflow_{trace_info.workflow_app_log_id}" if trace_info.workflow_app_log_id else f"workflow_{trace_info.workflow_run_id}",
             inputs=trace_info.workflow_run_inputs,
             run_type=LangSmithRunType.tool,
             start_time=trace_info.workflow_data.created_at,
@@ -125,18 +126,22 @@ class LangSmithDataTrace(BaseTraceInstance):
             node_type = node_execution.node_type
             status = node_execution.status
             if node_type == "llm":
-                inputs = (
-                    json.loads(node_execution.process_data).get("prompts", {}) if node_execution.process_data else {}
-                )
+                inputs = json.loads(node_execution.process_data).get(
+                    "prompts", {}
+                    ) if node_execution.process_data else {}
             else:
                 inputs = json.loads(node_execution.inputs) if node_execution.inputs else {}
-            outputs = json.loads(node_execution.outputs) if node_execution.outputs else {}
+            outputs = (
+                json.loads(node_execution.outputs) if node_execution.outputs else {}
+            )
             created_at = node_execution.created_at if node_execution.created_at else datetime.now()
             elapsed_time = node_execution.elapsed_time
             finished_at = created_at + timedelta(seconds=elapsed_time)
 
             execution_metadata = (
-                json.loads(node_execution.execution_metadata) if node_execution.execution_metadata else {}
+                json.loads(node_execution.execution_metadata)
+                if node_execution.execution_metadata
+                else {}
             )
             node_total_tokens = execution_metadata.get("total_tokens", 0)
 
@@ -163,7 +168,7 @@ class LangSmithDataTrace(BaseTraceInstance):
 
             langsmith_run = LangSmithRunModel(
                 total_tokens=node_total_tokens,
-                name=node_type,
+                name=f"{node_name}_{node_execution_id}",
                 inputs=inputs,
                 run_type=run_type,
                 start_time=created_at,
@@ -173,9 +178,7 @@ class LangSmithDataTrace(BaseTraceInstance):
                 extra={
                     "metadata": metadata,
                 },
-                parent_run_id=trace_info.workflow_app_log_id
-                if trace_info.workflow_app_log_id
-                else trace_info.workflow_run_id,
+                parent_run_id=trace_info.workflow_app_log_id if trace_info.workflow_app_log_id else trace_info.workflow_run_id,
                 tags=["node_execution"],
             )
 
@@ -195,9 +198,9 @@ class LangSmithDataTrace(BaseTraceInstance):
         metadata["user_id"] = user_id
 
         if message_data.from_end_user_id:
-            end_user_data: EndUser = (
-                db.session.query(EndUser).filter(EndUser.id == message_data.from_end_user_id).first()
-            )
+            end_user_data: EndUser = db.session.query(EndUser).filter(
+                EndUser.id == message_data.from_end_user_id
+            ).first()
             if end_user_data is not None:
                 end_user_id = end_user_data.session_id
                 metadata["end_user_id"] = end_user_id
@@ -207,7 +210,7 @@ class LangSmithDataTrace(BaseTraceInstance):
             output_tokens=trace_info.answer_tokens,
             total_tokens=trace_info.total_tokens,
             id=message_id,
-            name=TraceTaskName.MESSAGE_TRACE.value,
+            name=f"message_{message_id}",
             inputs=trace_info.inputs,
             run_type=LangSmithRunType.chain,
             start_time=trace_info.start_time,
@@ -227,7 +230,7 @@ class LangSmithDataTrace(BaseTraceInstance):
             input_tokens=trace_info.message_tokens,
             output_tokens=trace_info.answer_tokens,
             total_tokens=trace_info.total_tokens,
-            name="llm",
+            name=f"llm_{message_id}",
             inputs=trace_info.inputs,
             run_type=LangSmithRunType.llm,
             start_time=trace_info.start_time,
@@ -245,7 +248,7 @@ class LangSmithDataTrace(BaseTraceInstance):
 
     def moderation_trace(self, trace_info: ModerationTraceInfo):
         langsmith_run = LangSmithRunModel(
-            name=TraceTaskName.MODERATION_TRACE.value,
+            name="moderation",
             inputs=trace_info.inputs,
             outputs={
                 "action": trace_info.action,
@@ -268,7 +271,7 @@ class LangSmithDataTrace(BaseTraceInstance):
     def suggested_question_trace(self, trace_info: SuggestedQuestionTraceInfo):
         message_data = trace_info.message_data
         suggested_question_run = LangSmithRunModel(
-            name=TraceTaskName.SUGGESTED_QUESTION_TRACE.value,
+            name="suggested_question",
             inputs=trace_info.inputs,
             outputs=trace_info.suggested_question,
             run_type=LangSmithRunType.tool,
@@ -285,7 +288,7 @@ class LangSmithDataTrace(BaseTraceInstance):
 
     def dataset_retrieval_trace(self, trace_info: DatasetRetrievalTraceInfo):
         dataset_retrieval_run = LangSmithRunModel(
-            name=TraceTaskName.DATASET_RETRIEVAL_TRACE.value,
+            name="dataset_retrieval",
             inputs=trace_info.inputs,
             outputs={"documents": trace_info.documents},
             run_type=LangSmithRunType.retriever,
@@ -320,7 +323,7 @@ class LangSmithDataTrace(BaseTraceInstance):
 
     def generate_name_trace(self, trace_info: GenerateNameTraceInfo):
         name_run = LangSmithRunModel(
-            name=TraceTaskName.GENERATE_NAME_TRACE.value,
+            name="generate_name",
             inputs=trace_info.inputs,
             outputs=trace_info.outputs,
             run_type=LangSmithRunType.tool,

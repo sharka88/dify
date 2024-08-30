@@ -63,25 +63,30 @@ const RunPanel: FC<RunProps> = ({ hideResult, activeTab = 'RESULT', runID, getRe
   const formatNodeList = useCallback((list: NodeTracing[]) => {
     const allItems = list.reverse()
     const result: NodeTracing[] = []
-    let iterationIndex = 0
+    let iterationIndexInfos: {
+      start: number
+      end: number
+    }[] = []
     allItems.forEach((item) => {
-      const { node_type, execution_metadata } = item
+      const { node_type, index, execution_metadata } = item
       if (node_type !== BlockEnum.Iteration) {
-        const isInIteration = !!execution_metadata?.iteration_id
+        let isInIteration = false
+        let isIterationFirstNode = false
+        iterationIndexInfos.forEach(({ start, end }) => {
+          if (index >= start && index < end) {
+            if (index === start)
+              isIterationFirstNode = true
 
+            isInIteration = true
+          }
+        })
         if (isInIteration) {
           const iterationDetails = result[result.length - 1].details!
-          const currentIterationIndex = execution_metadata?.iteration_index
-          const isIterationFirstNode = iterationIndex !== currentIterationIndex || iterationDetails.length === 0
-
-          if (isIterationFirstNode) {
+          if (isIterationFirstNode)
             iterationDetails!.push([item])
-            iterationIndex = currentIterationIndex!
-          }
 
-          else {
+          else
             iterationDetails[iterationDetails.length - 1].push(item)
-          }
 
           return
         }
@@ -91,6 +96,26 @@ const RunPanel: FC<RunProps> = ({ hideResult, activeTab = 'RESULT', runID, getRe
         return
       }
 
+      const { steps_boundary } = execution_metadata
+      iterationIndexInfos = []
+      steps_boundary.forEach((boundary, index) => {
+        if (index === 0) {
+          iterationIndexInfos.push({
+            start: boundary,
+            end: 0,
+          })
+        }
+        else if (index === steps_boundary.length - 1) {
+          iterationIndexInfos[iterationIndexInfos.length - 1].end = boundary
+        }
+        else {
+          iterationIndexInfos[iterationIndexInfos.length - 1].end = boundary
+          iterationIndexInfos.push({
+            start: boundary,
+            end: 0,
+          })
+        }
+      })
       result.push({
         ...item,
         details: [],

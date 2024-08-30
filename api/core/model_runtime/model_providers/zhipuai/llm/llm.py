@@ -445,7 +445,6 @@ class ZhipuAILargeLanguageModel(_CommonZhipuaiAI, LargeLanguageModel):
                     delta=LLMResultChunkDelta(
                         index=delta.index,
                         message=assistant_prompt_message,
-                        finish_reason=delta.finish_reason
                     )
                 )
 

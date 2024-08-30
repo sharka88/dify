@@ -11,7 +11,7 @@ import {
   // MagicWand,
   // Robot,
 } from '@/app/components/base/icons/src/vender/solid/mediaAndDevices'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 
 type FeatureIconProps = {
   feature: ModelFeatureEnum
@@ -25,51 +25,49 @@ const FeatureIcon: FC<FeatureIconProps> = ({
 
   // if (feature === ModelFeatureEnum.agentThought) {
   //   return (
-  //     <Tooltip
+  //     <TooltipPlus
   //       popupContent={t('common.modelProvider.featureSupported', { feature: ModelFeatureTextEnum.agentThought })}
   //     >
   //       <ModelBadge className={`mr-0.5 !px-0 w-[18px] justify-center text-gray-500 ${className}`}>
   //         <Robot className='w-3 h-3' />
   //       </ModelBadge>
-  //     </Tooltip>
+  //     </TooltipPlus>
   //   )
   // }
 
   // if (feature === ModelFeatureEnum.toolCall) {
   //   return (
-  //     <Tooltip
+  //     <TooltipPlus
   //       popupContent={t('common.modelProvider.featureSupported', { feature: ModelFeatureTextEnum.toolCall })}
   //     >
   //       <ModelBadge className={`mr-0.5 !px-0 w-[18px] justify-center text-gray-500 ${className}`}>
   //         <MagicWand className='w-3 h-3' />
   //       </ModelBadge>
-  //     </Tooltip>
+  //     </TooltipPlus>
   //   )
   // }
 
   // if (feature === ModelFeatureEnum.multiToolCall) {
   //   return (
-  //     <Tooltip
+  //     <TooltipPlus
   //       popupContent={t('common.modelProvider.featureSupported', { feature: ModelFeatureTextEnum.multiToolCall })}
   //     >
   //       <ModelBadge className={`mr-0.5 !px-0 w-[18px] justify-center text-gray-500 ${className}`}>
   //         <MagicBox className='w-3 h-3' />
   //       </ModelBadge>
-  //     </Tooltip>
+  //     </TooltipPlus>
   //   )
   // }
 
   if (feature === ModelFeatureEnum.vision) {
     return (
-      <Tooltip
+      <TooltipPlus
         popupContent={t('common.modelProvider.featureSupported', { feature: ModelFeatureTextEnum.vision })}
       >
-        <div className='inline-block cursor-help'>
-          <ModelBadge className={`mr-0.5 !px-0 w-[18px] justify-center text-gray-500 ${className}`}>
-            <MagicEyes className='w-3 h-3' />
-          </ModelBadge>
-        </div>
-      </Tooltip>
+        <ModelBadge className={`mr-0.5 !px-0 w-[18px] justify-center text-gray-500 ${className}`}>
+          <MagicEyes className='w-3 h-3' />
+        </ModelBadge>
+      </TooltipPlus>
     )
   }
 

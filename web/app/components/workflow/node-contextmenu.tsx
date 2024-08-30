@@ -1,6 +1,5 @@
 import {
   memo,
-  useEffect,
   useRef,
 } from 'react'
 import { useClickAway } from 'ahooks'
@@ -10,17 +9,12 @@ import type { Node } from './types'
 import { useStore } from './store'
 import { usePanelInteractions } from './hooks'
 
-const NodeContextmenu = () => {
+const PanelContextmenu = () => {
   const ref = useRef(null)
   const nodes = useNodes()
-  const { handleNodeContextmenuCancel, handlePaneContextmenuCancel } = usePanelInteractions()
+  const { handleNodeContextmenuCancel } = usePanelInteractions()
   const nodeMenu = useStore(s => s.nodeMenu)
   const currentNode = nodes.find(node => node.id === nodeMenu?.nodeId) as Node
-
-  useEffect(() => {
-    if (nodeMenu)
-      handlePaneContextmenuCancel()
-  }, [nodeMenu, handlePaneContextmenuCancel])
 
   useClickAway(() => {
     handleNodeContextmenuCancel()
@@ -48,4 +42,4 @@ const NodeContextmenu = () => {
   )
 }
 
-export default memo(NodeContextmenu)
+export default memo(PanelContextmenu)

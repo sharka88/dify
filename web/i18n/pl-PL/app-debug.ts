@@ -275,14 +275,14 @@ const translation = {
     typeSelect: 'Wybierz',
   },
   varKeyError: {
-    canNoBeEmpty: '{{klucz}} jest wymagany',
+    canNoBeEmpty: 'Klucz zmiennej nie może być pusty',
     tooLong:
-      '{{key}} za długi. Nie może być dłuższy niż 30 znaków',
+      'Klucz zmiennej: {{key}} za długi. Nie może być dłuższy niż 30 znaków',
     notValid:
-      '{{key}} jest nieprawidłowy. Może zawierać tylko litery, cyfry i podkreślenia',
+      'Klucz zmiennej: {{key}} jest nieprawidłowy. Może zawierać tylko litery, cyfry i podkreślenia',
     notStartWithNumber:
-      '{{key}} nie może zaczynać się od cyfry',
-    keyAlreadyExists: '{{key}} już istnieje',
+      'Klucz zmiennej: {{key}} nie może zaczynać się od cyfry',
+    keyAlreadyExists: 'Klucz zmiennej: :{{key}} już istnieje',
   },
   otherError: {
     promptNoBeEmpty: 'Monit nie może być pusty',

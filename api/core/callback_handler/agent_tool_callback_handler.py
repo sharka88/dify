@@ -4,8 +4,7 @@ from typing import Any, Optional, TextIO, Union
 
 from pydantic import BaseModel
 
-from core.ops.entities.trace_entity import TraceTaskName
-from core.ops.ops_trace_manager import TraceQueueManager, TraceTask
+from core.ops.ops_trace_manager import TraceQueueManager, TraceTask, TraceTaskName
 from core.tools.entities.tool_entities import ToolInvokeMessage
 
 _TEXT_COLOR_MAPPING = {

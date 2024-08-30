@@ -159,9 +159,10 @@ class WeightRerankRunner:
             if 'score' in document.metadata:
                 query_vector_scores.append(document.metadata['score'])
             else:
+                content_vector = document.metadata['vector']
                 # transform to NumPy
                 vec1 = np.array(query_vector)
-                vec2 = np.array(document.vector)
+                vec2 = np.array(document.metadata['vector'])
 
                 # calculate dot product
                 dot_product = np.dot(vec1, vec2)

@@ -5,9 +5,6 @@ label:
 model_type: llm
 features:
   - vision
-  - tool-call
-  - multi-tool-call
-  - stream-tool-call
 model_properties:
   mode: chat
   context_size: 32000

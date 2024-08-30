@@ -278,14 +278,14 @@ const translation = {
     typeSelect: 'Seleziona',
   },
   varKeyError: {
-    canNoBeEmpty: '{{key}} è obbligatorio',
+    canNoBeEmpty: 'La chiave della variabile non può essere vuota',
     tooLong:
-      '{{key}} è troppo lunga. Non può essere più lunga di 30 caratteri',
+      'La chiave della variabile: {{key}} è troppo lunga. Non può essere più lunga di 30 caratteri',
     notValid:
-      '{{key}} non è valida. Può contenere solo lettere, numeri e underscore',
+      'La chiave della variabile: {{key}} non è valida. Può contenere solo lettere, numeri e underscore',
     notStartWithNumber:
-      '{{key}} non può iniziare con un numero',
-    keyAlreadyExists: '{{key}} esiste già',
+      'La chiave della variabile: {{key}} non può iniziare con un numero',
+    keyAlreadyExists: 'La chiave della variabile: {{key}} esiste già',
   },
   otherError: {
     promptNoBeEmpty: 'Il prompt non può essere vuoto',

@@ -8,8 +8,6 @@ import {
 } from '@remixicon/react'
 import { useRouter } from 'next/navigation'
 import { useContext, useContextSelector } from 'use-context-selector'
-import AppIconPicker from '../../base/app-icon-picker'
-import type { AppIconSelection } from '../../base/app-icon-picker'
 import s from './style.module.css'
 import cn from '@/utils/classnames'
 import AppsContext, { useAppContext } from '@/context/app-context'
@@ -20,10 +18,11 @@ import { createApp } from '@/service/apps'
 import Modal from '@/app/components/base/modal'
 import Button from '@/app/components/base/button'
 import AppIcon from '@/app/components/base/app-icon'
+import EmojiPicker from '@/app/components/base/emoji-picker'
 import AppsFull from '@/app/components/billing/apps-full-in-dialog'
 import { AiText, ChatBot, CuteRobote } from '@/app/components/base/icons/src/vender/solid/communication'
 import { Route } from '@/app/components/base/icons/src/vender/solid/mapsAndTravel'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 import { NEED_REFRESH_APP_LIST_KEY } from '@/config'
 import { getRedirection } from '@/utils/app-redirection'
 
@@ -41,8 +40,8 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
 
   const [appMode, setAppMode] = useState<AppMode>('chat')
   const [showChatBotType, setShowChatBotType] = useState<boolean>(true)
-  const [appIcon, setAppIcon] = useState<AppIconSelection>({ type: 'emoji', icon: '🤖', background: '#FFEAD5' })
-  const [showAppIconPicker, setShowAppIconPicker] = useState(false)
+  const [emoji, setEmoji] = useState({ icon: '🤖', icon_background: '#FFEAD5' })
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
 
@@ -67,9 +66,8 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
       const app = await createApp({
         name,
         description,
-        icon_type: appIcon.type,
-        icon: appIcon.type === 'emoji' ? appIcon.icon : appIcon.fileId,
-        icon_background: appIcon.type === 'emoji' ? appIcon.background : undefined,
+        icon: emoji.icon,
+        icon_background: emoji.icon_background,
         mode: appMode,
       })
       notify({ type: 'success', message: t('app.newApp.appCreated') })
@@ -83,7 +81,7 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
       notify({ type: 'error', message: t('app.newApp.appCreateFailed') })
     }
     isCreatingRef.current = false
-  }, [name, notify, t, appMode, appIcon, description, onSuccess, onClose, mutateApps, push, isCurrentWorkspaceEditor])
+  }, [name, notify, t, appMode, emoji.icon, emoji.icon_background, description, onSuccess, onClose, mutateApps, push, isCurrentWorkspaceEditor])
 
   return (
     <Modal
@@ -100,7 +98,8 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
       <div className='py-2 px-8'>
         <div className='py-2 text-sm leading-[20px] font-medium text-gray-900'>{t('app.newApp.captionAppType')}</div>
         <div className='flex'>
-          <Tooltip
+          <TooltipPlus
+            hideArrow
             popupContent={
               <div className='max-w-[280px] leading-[18px] text-xs text-gray-700'>{t('app.newApp.chatbotDescription')}</div>
             }
@@ -119,8 +118,9 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
               <ChatBot className='w-6 h-6 text-[#1570EF]' />
               <div className='h-5 text-[13px] font-medium leading-[18px]'>{t('app.types.chatbot')}</div>
             </div>
-          </Tooltip>
-          <Tooltip
+          </TooltipPlus>
+          <TooltipPlus
+            hideArrow
             popupContent={
               <div className='flex flex-col max-w-[320px] leading-[18px] text-xs'>
                 <div className='text-gray-700'>{t('app.newApp.completionDescription')}</div>
@@ -141,8 +141,9 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
               <AiText className='w-6 h-6 text-[#0E9384]' />
               <div className='h-5 text-[13px] font-medium leading-[18px]'>{t('app.newApp.completeApp')}</div>
             </div>
-          </Tooltip>
-          <Tooltip
+          </TooltipPlus>
+          <TooltipPlus
+            hideArrow
             popupContent={
               <div className='max-w-[280px] leading-[18px] text-xs text-gray-700'>{t('app.newApp.agentDescription')}</div>
             }
@@ -161,8 +162,9 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
               <CuteRobote className='w-6 h-6 text-indigo-600' />
               <div className='h-5 text-[13px] font-medium leading-[18px]'>{t('app.types.agent')}</div>
             </div>
-          </Tooltip>
-          <Tooltip
+          </TooltipPlus>
+          <TooltipPlus
+            hideArrow
             popupContent={
               <div className='flex flex-col max-w-[320px] leading-[18px] text-xs'>
                 <div className='text-gray-700'>{t('app.newApp.workflowDescription')}</div>
@@ -184,7 +186,7 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
               <div className='h-5 text-[13px] font-medium leading-[18px]'>{t('app.types.workflow')}</div>
               <span className='absolute top-[-3px] right-[-3px] px-1 rounded-[5px] bg-white border border-black/8 text-gray-500 text-[10px] leading-[18px] font-medium'>BETA</span>
             </div>
-          </Tooltip>
+          </TooltipPlus>
         </div>
       </div>
       {showChatBotType && (
@@ -267,14 +269,7 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
       <div className='pt-2 px-8'>
         <div className='py-2 text-sm font-medium leading-[20px] text-gray-900'>{t('app.newApp.captionName')}</div>
         <div className='flex items-center justify-between space-x-2'>
-          <AppIcon
-            iconType={appIcon.type}
-            icon={appIcon.type === 'emoji' ? appIcon.icon : appIcon.fileId}
-            background={appIcon.type === 'emoji' ? appIcon.background : undefined}
-            imageUrl={appIcon.type === 'image' ? appIcon.url : undefined}
-            size='large' className='cursor-pointer'
-            onClick={() => { setShowAppIconPicker(true) }}
-          />
+          <AppIcon size='large' onClick={() => { setShowEmojiPicker(true) }} className='cursor-pointer' icon={emoji.icon} background={emoji.icon_background} />
           <input
             value={name}
             onChange={e => setName(e.target.value)}
@@ -282,13 +277,14 @@ const CreateAppModal = ({ show, onSuccess, onClose }: CreateAppDialogProps) => {
             className='grow h-10 px-3 text-sm font-normal bg-gray-100 rounded-lg border border-transparent outline-none appearance-none caret-primary-600 placeholder:text-gray-400 hover:bg-gray-50 hover:border hover:border-gray-300 focus:bg-gray-50 focus:border focus:border-gray-300 focus:shadow-xs'
           />
         </div>
-        {showAppIconPicker && <AppIconPicker
-          onSelect={(payload) => {
-            setAppIcon(payload)
-            setShowAppIconPicker(false)
+        {showEmojiPicker && <EmojiPicker
+          onSelect={(icon, icon_background) => {
+            setEmoji({ icon, icon_background })
+            setShowEmojiPicker(false)
           }}
           onClose={() => {
-            setShowAppIconPicker(false)
+            setEmoji({ icon: '🤖', icon_background: '#FFEAD5' })
+            setShowEmojiPicker(false)
           }}
         />}
       </div>

@@ -35,7 +35,7 @@ import {
   useWorkflowHistory,
 } from '@/app/components/workflow/hooks'
 import { canRunBySingle } from '@/app/components/workflow/utils'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 import type { Node } from '@/app/components/workflow/types'
 import { useStore as useAppStore } from '@/app/components/app/store'
 import { useStore } from '@/app/components/workflow/store'
@@ -127,9 +127,8 @@ const BasePanel: FC<BasePanelProps> = ({
             <div className='shrink-0 flex items-center text-gray-500'>
               {
                 canRunBySingle(data.type) && !nodesReadOnly && (
-                  <Tooltip
+                  <TooltipPlus
                     popupContent={t('workflow.panel.runThisStep')}
-                    popupClassName='mr-1'
                   >
                     <div
                       className='flex items-center justify-center mr-1 w-6 h-6 rounded-md hover:bg-black/5 cursor-pointer'
@@ -140,7 +139,7 @@ const BasePanel: FC<BasePanelProps> = ({
                     >
                       <RiPlayLargeLine className='w-4 h-4 text-text-tertiary' />
                     </div>
-                  </Tooltip>
+                  </TooltipPlus>
                 )
               }
               <HelpLink nodeType={data.type} />

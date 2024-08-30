@@ -70,8 +70,9 @@ const PopupItem: FC<PopupItemProps> = ({
       {
         model.models.map(modelItem => (
           <Tooltip
+            selector={`${modelItem.model}-${modelItem.status}`}
             key={modelItem.model}
-            popupContent={modelItem.status !== ModelStatusEnum.active ? MODEL_STATUS_TEXT[modelItem.status][language] : undefined}
+            content={modelItem.status !== ModelStatusEnum.active ? MODEL_STATUS_TEXT[modelItem.status][language] : undefined}
             position='right'
           >
             <div

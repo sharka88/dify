@@ -73,11 +73,9 @@ const translation = {
   editAppTitle: 'Modifica Info App',
   editDone: 'Info app aggiornata',
   editFailed: 'Aggiornamento delle info dell\'app fallito',
-  iconPicker: {
+  emoji: {
     ok: 'OK',
     cancel: 'Annulla',
-    emoji: 'Emoji',
-    image: 'Immagine',
   },
   switch: 'Passa a Orchestrazione del flusso di lavoro',
   switchTipStart:

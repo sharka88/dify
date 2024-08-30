@@ -27,11 +27,10 @@ import ShareQRCode from '@/app/components/base/qrcode'
 import SecretKeyButton from '@/app/components/develop/secret-key/secret-key-button'
 import type { AppDetailResponse } from '@/models/app'
 import { useAppContext } from '@/context/app-context'
-import type { AppSSO } from '@/types/app'
 
 export type IAppCardProps = {
   className?: string
-  appInfo: AppDetailResponse & Partial<AppSSO>
+  appInfo: AppDetailResponse
   cardType?: 'api' | 'webapp'
   customBgColor?: string
   onChangeStatus: (val: boolean) => Promise<void>
@@ -134,8 +133,8 @@ function AppCard({
 
   return (
     <div
-      className={
-        `shadow-xs border-[0.5px] rounded-lg border-gray-200 ${className ?? ''}`}
+      className={`shadow-xs border-[0.5px] rounded-lg border-gray-200 ${className ?? ''
+      }`}
     >
       <div className={`px-6 py-5 ${customBgColor ?? bgColor} rounded-lg`}>
         <div className="mb-2.5 flex flex-row items-start justify-between">
@@ -176,6 +175,7 @@ function AppCard({
               {isApp && <ShareQRCode content={isApp ? appUrl : apiUrl} selectorId={randomString(8)} className={'hover:bg-gray-200'} />}
               <CopyFeedback
                 content={isApp ? appUrl : apiUrl}
+                selectorId={randomString(8)}
                 className={'hover:bg-gray-200'}
               />
               {/* button copy link/ button regenerate */}
@@ -194,15 +194,16 @@ function AppCard({
               )}
               {isApp && isCurrentWorkspaceManager && (
                 <Tooltip
-                  popupContent={t('appOverview.overview.appInfo.regenerate') || ''}
+                  content={t('appOverview.overview.appInfo.regenerate') || ''}
+                  selector={`code-generate-${randomString(8)}`}
                 >
                   <div
                     className="w-8 h-8 ml-0.5 cursor-pointer hover:bg-gray-200 rounded-lg"
                     onClick={() => setShowConfirmDelete(true)}
                   >
                     <div
-                      className={
-                        `w-full h-full ${style.refreshIcon} ${genLoading ? style.generateLogo : ''}`}
+                      className={`w-full h-full ${style.refreshIcon} ${genLoading ? style.generateLogo : ''
+                      }`}
                     ></div>
                   </div>
                 </Tooltip>
@@ -225,10 +226,11 @@ function AppCard({
                 disabled={disabled}
               >
                 <Tooltip
-                  popupContent={
+                  content={
                     t('appOverview.overview.appInfo.preUseReminder') ?? ''
                   }
-                  popupClassName={disabled ? 'mt-[-8px]' : '!hidden'}
+                  selector={`op-btn-${randomString(16)}`}
+                  className={disabled ? 'mt-[-8px]' : '!hidden'}
                 >
                   <div className="flex flex-row items-center">
                     <op.opIcon className="h-4 w-4 mr-1.5 stroke-[1.8px]" />

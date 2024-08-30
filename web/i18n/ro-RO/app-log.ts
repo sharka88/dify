@@ -4,9 +4,8 @@ const translation = {
   dateTimeFormat: 'DD/MM/YYYY hh:mm A',
   table: {
     header: {
-      updatedTime: 'Timp actualizare',
-      time: 'Timp creare',
-      endUser: 'Utilizator final sau cont',
+      time: 'Oră',
+      endUser: 'Utilizator final',
       input: 'Intrare',
       output: 'Ieșire',
       summary: 'Titlu',
@@ -17,7 +16,7 @@ const translation = {
       status: 'STARE',
       runtime: 'TIMP DE RULARE',
       tokens: 'JETOANE',
-      user: 'UTILIZATOR FINAL SAU CONT',
+      user: 'UTILIZATOR FINAL',
       version: 'VERSIUNE',
     },
     pagination: {
@@ -70,9 +69,6 @@ const translation = {
       annotated: 'Îmbunătățiri annotate ({{count}} elemente)',
       not_annotated: 'Fără annotări',
     },
-    sortBy: 'Sortează după:',
-    descending: 'descrescător',
-    ascending: 'crescător',
   },
   workflowTitle: 'Jurnale de flux de lucru',
   workflowSubtitle: 'Jurnalul a înregistrat operațiunea Automate.',

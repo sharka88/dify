@@ -239,7 +239,8 @@ class WeaviateVector(BaseVector):
         query_obj = self._client.query.get(collection_name, properties)
         if kwargs.get("where_filter"):
             query_obj = query_obj.with_where(kwargs.get("where_filter"))
-        query_obj = query_obj.with_additional(["vector"])
+        if kwargs.get("additional"):
+            query_obj = query_obj.with_additional(kwargs.get("additional"))
         properties = ['text']
         result = query_obj.with_bm25(query=query, properties=properties).with_limit(kwargs.get('top_k', 2)).do()
         if "errors" in result:
@@ -247,8 +248,7 @@ class WeaviateVector(BaseVector):
         docs = []
         for res in result["data"]["Get"][collection_name]:
             text = res.pop(Field.TEXT_KEY.value)
-            additional = res.pop('_additional')
-            docs.append(Document(page_content=text, vector=additional['vector'], metadata=res))
+            docs.append(Document(page_content=text, metadata=res))
         return docs
 
     def _default_schema(self, index_name: str) -> dict:

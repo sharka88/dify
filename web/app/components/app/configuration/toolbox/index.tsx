@@ -32,7 +32,7 @@ const Toolbox: FC<ToolboxProps> = ({
         )
       }
       {
-        showAnnotation && (
+        (showAnnotation || true) && (
           <Annotation
             onEmbeddingChange={onEmbeddingChange}
             onScoreChange={onScoreChange}

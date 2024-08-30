@@ -45,22 +45,14 @@ const translation = {
         webDescPlaceholder: 'Enter the description of the WebApp',
         language: 'Language',
         workflow: {
-          title: 'Workflow',
-          subTitle: 'Workflow Details',
+          title: 'Workflow Steps',
           show: 'Show',
           hide: 'Hide',
-          showDesc: 'Show or hide workflow details in WebApp',
         },
         chatColorTheme: 'Chat color theme',
         chatColorThemeDesc: 'Set the color theme of the chatbot',
         chatColorThemeInverted: 'Inverted',
         invalidHexMessage: 'Invalid hex value',
-        sso: {
-          label: 'SSO Authentication',
-          title: 'WebApp SSO',
-          description: 'All users are required to login with SSO before using WebApp',
-          tooltip: 'Contact the administrator to enable WebApp SSO',
-        },
         more: {
           entry: 'Show more settings',
           copyright: 'Copyright',
@@ -127,11 +119,7 @@ const translation = {
     tokenPS: 'Token/s',
     totalMessages: {
       title: 'Total Messages',
-      explanation: 'Daily AI interactions count.',
-    },
-    totalConversations: {
-      title: 'Total Conversations',
-      explanation: 'Daily AI conversations count; prompt engineering/debugging excluded.',
+      explanation: 'Daily AI interactions count; prompt engineering/debugging excluded.',
     },
     activeUsers: {
       title: 'Active Users',

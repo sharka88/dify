@@ -36,7 +36,6 @@ import { DEFAULT_VALUE_MAX_LEN, appDefaultIconBackground } from '@/config'
 import Toast from '@/app/components/base/toast'
 import type { VisionFile, VisionSettings } from '@/types/app'
 import { Resolution, TransferMethod } from '@/types/app'
-import { useAppFavicon } from '@/hooks/use-app-favicon'
 
 const GROUP_SIZE = 5 // to avoid RPM(Request per minute) limit. The group task finished then the next group.
 enum TaskStatus {
@@ -364,8 +363,6 @@ const TextGeneration: FC<IMainProps> = ({
             title: installedAppInfo?.app.name,
             prompt_public: false,
             copyright: '',
-            icon: installedAppInfo?.app.icon,
-            icon_background: installedAppInfo?.app.icon_background,
           },
           plan: 'basic',
         }
@@ -410,14 +407,6 @@ const TextGeneration: FC<IMainProps> = ({
         document.title = `${siteInfo.title} - Powered by Dify`
     }
   }, [siteInfo?.title, canReplaceLogo])
-
-  useAppFavicon({
-    enable: !isInstalledApp,
-    icon_type: siteInfo?.icon_type,
-    icon: siteInfo?.icon,
-    icon_background: siteInfo?.icon_background,
-    icon_url: siteInfo?.icon_url,
-  })
 
   const [isShowResSidebar, { setTrue: doShowResSidebar, setFalse: hideResSidebar }] = useBoolean(false)
   const showResSidebar = () => {
@@ -551,13 +540,7 @@ const TextGeneration: FC<IMainProps> = ({
           <div className='mb-6'>
             <div className='flex items-center justify-between'>
               <div className='flex items-center space-x-3'>
-                <AppIcon
-                  size="small"
-                  iconType={siteInfo.icon_type}
-                  icon={siteInfo.icon}
-                  background={siteInfo.icon_background || appDefaultIconBackground}
-                  imageUrl={siteInfo.icon_url}
-                />
+                <AppIcon size="small" icon={siteInfo.icon} background={siteInfo.icon_background || appDefaultIconBackground} />
                 <div className='text-lg font-semibold text-gray-800'>{siteInfo.title}</div>
               </div>
               {!isPC && (

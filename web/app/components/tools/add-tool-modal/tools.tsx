@@ -68,9 +68,10 @@ const Blocks = ({
           return (
             <Tooltip
               key={tool.name}
+              selector={`workflow-block-tool-${tool.name}`}
               position='bottom'
-              popupClassName='!p-0 !px-3 !py-2.5 !w-[210px] !leading-[18px] !text-xs !text-gray-700 !border-[0.5px] !border-black/5 !bg-transparent !rounded-xl !shadow-lg translate-x-[108px]'
-              popupContent={(
+              className='!p-0 !px-3 !py-2.5 !w-[210px] !leading-[18px] !text-xs !text-gray-700 !border-[0.5px] !border-black/5 !bg-transparent !rounded-xl !shadow-lg translate-x-[108px]'
+              htmlContent={(
                 <div>
                   <BlockIcon
                     size='md'
@@ -90,7 +91,7 @@ const Blocks = ({
                   )}
                 </div>
               )}
-              needsDelay
+              noArrow
             >
               <div className='group/item flex items-center w-full pl-3 pr-1 h-8 rounded-lg hover:bg-gray-50 cursor-pointer'>
                 <BlockIcon

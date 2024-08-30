@@ -1,9 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import Button from '../../base/button'
 import Tag from '../../base/tag'
+import Tooltip from '../../base/tooltip'
 import { getIcon } from '../common/retrieval-method-info'
 import s from './style.module.css'
-import Tooltip from '@/app/components/base/tooltip'
 import cn from '@/utils/classnames'
 import type { HitTestingResponse } from '@/models/datasets'
 import { hitTesting } from '@/service/datasets'
@@ -74,7 +74,8 @@ const TextAreaWithButton = ({
               {t('datasetHitTesting.input.title')}
             </span>
             <Tooltip
-              popupContent={t('dataset.retrieval.changeRetrievalMethod')}
+              selector={'change-retrieval-method'}
+              htmlContent={t('dataset.retrieval.changeRetrievalMethod')}
             >
               <div
                 onClick={onClickRetrievalMethod}
@@ -98,7 +99,8 @@ const TextAreaWithButton = ({
             {text?.length > 200
               ? (
                 <Tooltip
-                  popupContent={t('datasetHitTesting.input.countWarning')}
+                  content={t('datasetHitTesting.input.countWarning') as string}
+                  selector="hit-testing-warning"
                 >
                   <div>
                     <Tag color="red" className="!text-red-600">

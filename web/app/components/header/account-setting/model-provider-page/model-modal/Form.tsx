@@ -1,6 +1,8 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import type { FC } from 'react'
-import { RiQuestionLine } from '@remixicon/react'
+import {
+  RiQuestionLine,
+} from '@remixicon/react'
 import { ValidatingTip } from '../../key-validator/ValidateStatus'
 import type {
   CredentialFormSchema,
@@ -16,7 +18,7 @@ import { useLanguage } from '../hooks'
 import Input from './Input'
 import cn from '@/utils/classnames'
 import { SimpleSelect } from '@/app/components/base/select'
-import Tooltip from '@/app/components/base/tooltip'
+import Tooltip from '@/app/components/base/tooltip-plus'
 import Radio from '@/app/components/base/radio'
 type FormProps = {
   className?: string
@@ -68,16 +70,6 @@ const Form: FC<FormProps> = ({
     onChange({ ...value, [key]: val, ...shouldClearVariable })
   }
 
-  // convert tooltip '\n' to <br />
-  const renderTooltipContent = (content: string) => {
-    return content.split('\n').map((line, index, array) => (
-      <Fragment key={index}>
-        {line}
-        {index < array.length - 1 && <br />}
-      </Fragment>
-    ))
-  }
-
   const renderField = (formSchema: CredentialFormSchema) => {
     const tooltip = formSchema.tooltip
     const tooltipContent = (tooltip && (
@@ -85,7 +77,7 @@ const Form: FC<FormProps> = ({
         <Tooltip popupContent={
           // w-[100px] caused problem
           <div className=''>
-            {renderTooltipContent(tooltip[language] || tooltip.en_US)}
+            {tooltip[language] || tooltip.en_US}
           </div>
         } >
           <RiQuestionLine className='w-3 h-3  text-gray-500' />

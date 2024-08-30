@@ -1,5 +1,4 @@
 """Abstract interface for file storage implementations."""
-
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 
@@ -7,8 +6,8 @@ from flask import Flask
 
 
 class BaseStorage(ABC):
-    """Interface for file storage."""
-
+    """Interface for file storage.
+    """
     app = None
 
     def __init__(self, app: Flask):

@@ -2,8 +2,8 @@ const translation = {
   title: 'Khám phá',
   sidebar: {
     discovery: 'Khám phá',
-    chat: 'Trò chuyện',
-    workspace: 'Không gian làm việc',
+    chat: 'Chat',
+    workspace: 'Kho lưu trữ',
     action: {
       pin: 'Ghim',
       unpin: 'Bỏ ghim',
@@ -16,23 +16,23 @@ const translation = {
     },
   },
   apps: {
-    title: 'Khám phá ứng dụng bởi Dify',
-    description: 'Sử dụng ngay các ứng dụng mẫu này hoặc tùy chỉnh ứng dụng của bạn dựa trên các mẫu có sẵn.',
+    title: 'Khám phá Ứng dụng bởi Dify',
+    description: 'Sử dụng ngay các ứng dụng mẫu này hoặc tùy chỉnh các ứng dụng của bạn dựa trên các mẫu.',
     allCategories: 'Tất cả danh mục',
   },
   appCard: {
-    addToWorkspace: 'Thêm vào không gian làm việc',
+    addToWorkspace: 'Thêm vào Kho lưu trữ',
     customize: 'Tùy chỉnh',
   },
   appCustomize: {
     title: 'Tạo ứng dụng từ {{name}}',
     subTitle: 'Biểu tượng và tên ứng dụng',
-    nameRequired: 'Vui lòng nhập tên ứng dụng',
+    nameRequired: 'Tên ứng dụng là bắt buộc',
   },
   category: {
     Assistant: 'Trợ lý',
-    Writing: 'Viết lách',
-    Translate: 'Dịch thuật',
+    Writing: 'Viết',
+    Translate: 'Dịch',
     Programming: 'Lập trình',
     HR: 'Nhân sự',
   },

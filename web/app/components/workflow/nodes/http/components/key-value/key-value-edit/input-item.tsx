@@ -18,7 +18,6 @@ type Props = {
   onRemove?: () => void
   placeholder?: string
   readOnly?: boolean
-  insertVarTipToLeft?: boolean
 }
 
 const InputItem: FC<Props> = ({
@@ -31,7 +30,6 @@ const InputItem: FC<Props> = ({
   onRemove,
   placeholder,
   readOnly,
-  insertVarTipToLeft,
 }) => {
   const { t } = useTranslation()
 
@@ -66,7 +64,6 @@ const InputItem: FC<Props> = ({
             placeholder={t('workflow.nodes.http.insertVarPlaceholder')!}
             placeholderClassName='!leading-[21px]'
             promptMinHeightClassName='h-full'
-            insertVarTipToLeft={insertVarTipToLeft}
           />
         )
         : <div
@@ -86,7 +83,6 @@ const InputItem: FC<Props> = ({
               placeholder={t('workflow.nodes.http.insertVarPlaceholder')!}
               placeholderClassName='!leading-[21px]'
               promptMinHeightClassName='h-full'
-              insertVarTipToLeft={insertVarTipToLeft}
             />
           )}
 

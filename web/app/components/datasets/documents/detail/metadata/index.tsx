@@ -79,7 +79,7 @@ export const FieldInfo: FC<IFieldInfoProps> = ({
               />
               : <Input
                 className={s.input}
-                onChange={e => onUpdate?.(e.target.value)}
+                onChange={onUpdate}
                 value={value}
                 defaultValue={defaultValue}
                 placeholder={`${t('datasetDocuments.metadata.placeholder.add')}${label}`}
@@ -102,9 +102,7 @@ const IconButton: FC<{
   const metadataMap = useMetadataMap()
 
   return (
-    <Tooltip
-      popupContent={metadataMap[type].text}
-    >
+    <Tooltip content={metadataMap[type].text} selector={`doc-metadata-${type}`}>
       <button className={cn(s.iconWrapper, 'group', isChecked ? s.iconCheck : '')}>
         <TypeIcon
           iconName={metadataMap[type].iconName || ''}

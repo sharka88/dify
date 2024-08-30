@@ -22,7 +22,7 @@ import { Plan } from '@/app/components/billing/type'
 import { ZapFast } from '@/app/components/base/icons/src/vender/solid/general'
 import UpgradeBtn from '@/app/components/billing/upgrade-btn'
 import { useProviderContext } from '@/context/provider-context'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 import { sleep } from '@/utils'
 
 type Props = {
@@ -259,18 +259,16 @@ const EmbeddingProcess: FC<Props> = ({ datasetId, batchId, documents = [], index
                 <div className={s.percent}>{`${getSourcePercent(indexingStatusDetail)}%`}</div>
               )}
               {indexingStatusDetail.indexing_status === 'error' && indexingStatusDetail.error && (
-                <Tooltip
-                  popupContent={(
-                    <div className='max-w-[400px]'>
-                      {indexingStatusDetail.error}
-                    </div>
-                  )}
-                >
+                <TooltipPlus popupContent={(
+                  <div className='max-w-[400px]'>
+                    {indexingStatusDetail.error}
+                  </div>
+                )}>
                   <div className={cn(s.percent, s.error, 'flex items-center')}>
                     Error
                     <RiErrorWarningFill className='ml-1 w-4 h-4' />
                   </div>
-                </Tooltip>
+                </TooltipPlus>
               )}
               {indexingStatusDetail.indexing_status === 'error' && !indexingStatusDetail.error && (
                 <div className={cn(s.percent, s.error, 'flex items-center')}>

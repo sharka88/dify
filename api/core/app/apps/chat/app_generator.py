@@ -3,7 +3,7 @@ import os
 import threading
 import uuid
 from collections.abc import Generator
-from typing import Any, Literal, Union, overload
+from typing import Any, Union
 
 from flask import Flask, current_app
 from pydantic import ValidationError
@@ -28,31 +28,13 @@ logger = logging.getLogger(__name__)
 
 
 class ChatAppGenerator(MessageBasedAppGenerator):
-    @overload
-    def generate(
-        self, app_model: App,
-        user: Union[Account, EndUser],
-        args: Any,
-        invoke_from: InvokeFrom,
-        stream: Literal[True] = True,
-    ) -> Generator[str, None, None]: ...
-
-    @overload
-    def generate(
-        self, app_model: App,
-        user: Union[Account, EndUser],
-        args: Any,
-        invoke_from: InvokeFrom,
-        stream: Literal[False] = False,
-    ) -> dict: ...
-
     def generate(
         self, app_model: App,
         user: Union[Account, EndUser],
         args: Any,
         invoke_from: InvokeFrom,
         stream: bool = True,
-    ) -> Union[dict, Generator[str, None, None]]:
+    ) -> Union[dict, Generator[dict, None, None]]:
         """
         Generate App response.
 

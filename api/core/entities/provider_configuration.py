@@ -8,7 +8,6 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict
 
-from constants import HIDDEN_VALUE
 from core.entities.model_entities import ModelStatus, ModelWithProviderEntity, SimpleModelProviderEntity
 from core.entities.provider_entities import (
     CustomConfiguration,
@@ -203,7 +202,7 @@ class ProviderConfiguration(BaseModel):
             for key, value in credentials.items():
                 if key in provider_credential_secret_variables:
                     # if send [__HIDDEN__] in secret input, it will be same as original value
-                    if value == HIDDEN_VALUE and key in original_credentials:
+                    if value == '[__HIDDEN__]' and key in original_credentials:
                         credentials[key] = encrypter.decrypt_token(self.tenant_id, original_credentials[key])
 
         credentials = model_provider_factory.provider_credentials_validate(
@@ -346,7 +345,7 @@ class ProviderConfiguration(BaseModel):
             for key, value in credentials.items():
                 if key in provider_credential_secret_variables:
                     # if send [__HIDDEN__] in secret input, it will be same as original value
-                    if value == HIDDEN_VALUE and key in original_credentials:
+                    if value == '[__HIDDEN__]' and key in original_credentials:
                         credentials[key] = encrypter.decrypt_token(self.tenant_id, original_credentials[key])
 
         credentials = model_provider_factory.model_credentials_validate(

@@ -1,6 +1,5 @@
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { RiQuestionLine } from '@remixicon/react'
+import { QuestionMarkCircleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import InvitationLink from './invitation-link'
@@ -65,11 +64,12 @@ const InvitedModal = ({
                       failedInvationResults.map(item =>
                         <div key={item.email} className='flex justify-center border border-red-300 rounded-md px-1 bg-orange-50'>
                           <Tooltip
-                            popupContent={item.message}
+                            selector={`invitation-tag-${item.email}`}
+                            htmlContent={item.message}
                           >
                             <div className='flex justify-center items-center text-sm gap-1'>
                               {item.email}
-                              <RiQuestionLine className='w-4 h-4 text-red-300' />
+                              <QuestionMarkCircleIcon className='w-4 h-4 text-red-300' />
                             </div>
                           </Tooltip>
                         </div>,

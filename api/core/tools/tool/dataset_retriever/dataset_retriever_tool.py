@@ -78,8 +78,7 @@ class DatasetRetrieverTool(DatasetRetrieverBaseTool):
                                                       top_k=self.top_k,
                                                       score_threshold=retrieval_model.get('score_threshold', .0)
                                                       if retrieval_model['score_threshold_enabled'] else None,
-                                                      reranking_model=retrieval_model.get('reranking_model', None)
-                                                      if retrieval_model['reranking_enable'] else None,
+                                                      reranking_model=retrieval_model.get('reranking_model', None),
                                                       reranking_mode=retrieval_model.get('reranking_mode')
                                                       if retrieval_model.get('reranking_mode') else 'reranking_model',
                                                       weights=retrieval_model.get('weights', None),

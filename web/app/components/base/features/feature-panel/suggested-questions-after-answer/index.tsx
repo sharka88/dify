@@ -2,8 +2,11 @@
 import type { FC } from 'react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  RiQuestionLine,
+} from '@remixicon/react'
 import { MessageSmileSquare } from '@/app/components/base/icons/src/vender/solid/communication'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 
 const SuggestedQuestionsAfterAnswer: FC = () => {
   const { t } = useTranslation()
@@ -15,7 +18,9 @@ const SuggestedQuestionsAfterAnswer: FC = () => {
       </div>
       <div className='shrink-0 mr-2 flex items-center whitespace-nowrap text-sm text-gray-800 font-semibold'>
         <div className='mr-2'>{t('appDebug.feature.suggestedQuestionsAfterAnswer.title')}</div>
-        <Tooltip popupContent={t('appDebug.feature.suggestedQuestionsAfterAnswer.description')}/>
+        <TooltipPlus popupContent={t('appDebug.feature.suggestedQuestionsAfterAnswer.description')}>
+          <RiQuestionLine className='w-[14px] h-[14px] text-gray-400' />
+        </TooltipPlus>
       </div>
       <div className='grow'></div>
       <div className='text-xs text-gray-500'>{t('appDebug.feature.suggestedQuestionsAfterAnswer.resDes')}</div>

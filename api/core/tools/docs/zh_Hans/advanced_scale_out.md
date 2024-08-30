@@ -21,7 +21,6 @@ Dify支持`文本` `链接` `图片` `文件BLOB` `JSON` 等多种消息类型�
             create an image message
 
             :param image: the url of the image
-            :param save_as: save as
             :return: the image message
         """
 ```
@@ -35,7 +34,6 @@ Dify支持`文本` `链接` `图片` `文件BLOB` `JSON` 等多种消息类型�
             create a link message
 
             :param link: the url of the link
-            :param save_as: save as
             :return: the link message
         """
 ```
@@ -49,7 +47,6 @@ Dify支持`文本` `链接` `图片` `文件BLOB` `JSON` 等多种消息类型�
             create a text message
 
             :param text: the text of the message
-            :param save_as: save as
             :return: the text message
         """
 ```
@@ -66,8 +63,6 @@ Dify支持`文本` `链接` `图片` `文件BLOB` `JSON` 等多种消息类型�
             create a blob message
 
             :param blob: the blob
-            :param meta: meta
-            :param save_as: save as
             :return: the blob message
         """
 ```

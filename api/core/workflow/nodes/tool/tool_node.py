@@ -2,20 +2,19 @@ from collections.abc import Mapping, Sequence
 from os import path
 from typing import Any, cast
 
-from core.app.segments import ArrayAnySegment, ArrayAnyVariable, parser
+from core.app.segments import parser
 from core.callback_handler.workflow_tool_callback_handler import DifyWorkflowCallbackHandler
 from core.file.file_obj import FileTransferMethod, FileType, FileVar
 from core.tools.entities.tool_entities import ToolInvokeMessage, ToolParameter
 from core.tools.tool_engine import ToolEngine
 from core.tools.tool_manager import ToolManager
 from core.tools.utils.message_transformer import ToolFileMessageTransformer
-from core.workflow.entities.node_entities import NodeRunMetadataKey, NodeRunResult, NodeType
+from core.workflow.entities.node_entities import NodeRunMetadataKey, NodeRunResult, NodeType, SystemVariable
 from core.workflow.entities.variable_pool import VariablePool
-from core.workflow.enums import SystemVariableKey
 from core.workflow.nodes.base_node import BaseNode
 from core.workflow.nodes.tool.entities import ToolNodeData
 from core.workflow.utils.variable_template_parser import VariableTemplateParser
-from models import WorkflowNodeExecutionStatus
+from models.workflow import WorkflowNodeExecutionStatus
 
 
 class ToolNode(BaseNode):
@@ -119,7 +118,6 @@ class ToolNode(BaseNode):
         for parameter_name in node_data.tool_parameters:
             parameter = tool_parameters_dictionary.get(parameter_name)
             if not parameter:
-                result[parameter_name] = None
                 continue
             if parameter.type == ToolParameter.ToolParameterType.FILE:
                 result[parameter_name] = [
@@ -141,9 +139,9 @@ class ToolNode(BaseNode):
         return result
 
     def _fetch_files(self, variable_pool: VariablePool) -> list[FileVar]:
-        variable = variable_pool.get(['sys', SystemVariableKey.FILES.value])
-        assert isinstance(variable, ArrayAnyVariable | ArrayAnySegment)
-        return list(variable.value) if variable else []
+        # FIXME: ensure this is a ArrayVariable contains FileVariable.
+        variable = variable_pool.get(['sys', SystemVariable.FILES.value])
+        return [file_var.value for file_var in variable.value] if variable else []
 
     def _convert_tool_messages(self, messages: list[ToolInvokeMessage]):
         """

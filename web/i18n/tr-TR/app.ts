@@ -67,11 +67,9 @@ const translation = {
   editAppTitle: 'Uygulama Bilgilerini Düzenle',
   editDone: 'Uygulama bilgileri güncellendi',
   editFailed: 'Uygulama bilgileri güncellenemedi',
-  iconPicker: {
+  emoji: {
     ok: 'Tamam',
     cancel: 'İptal',
-    emoji: 'Emoji',
-    image: 'Görsel',
   },
   switch: 'Workflow Orkestrasyonuna Geç',
   switchTipStart: 'Sizin için yeni bir uygulama kopyası oluşturulacak ve yeni kopya Workflow Orkestrasyonuna geçecektir. Yeni kopya ',

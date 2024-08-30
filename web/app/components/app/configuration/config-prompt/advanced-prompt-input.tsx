@@ -9,6 +9,7 @@ import produce from 'immer'
 import {
   RiDeleteBinLine,
   RiErrorWarningFill,
+  RiQuestionLine,
 } from '@remixicon/react'
 import s from './style.module.css'
 import MessageTypeSelector from './message-type-selector'
@@ -173,12 +174,12 @@ const AdvancedPromptInput: FC<Props> = ({
                     <div className='text-sm font-semibold uppercase text-indigo-800'>{t('appDebug.pageTitle.line1')}
                     </div>
                     <Tooltip
-                      popupContent={
-                        <div className='w-[180px]'>
-                          {t('appDebug.promptTip')}
-                        </div>
-                      }
-                    />
+                      htmlContent={<div className='w-[180px]'>
+                        {t('appDebug.promptTip')}
+                      </div>}
+                      selector='config-prompt-tooltip'>
+                      <RiQuestionLine className='w-[14px] h-[14px] text-indigo-400' />
+                    </Tooltip>
                   </div>)}
               <div className={cn(s.optionWrap, 'items-center space-x-1')}>
                 {canDelete && (

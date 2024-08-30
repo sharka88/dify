@@ -8,7 +8,7 @@ import { useDebounceFn } from 'ahooks'
 import { useContext } from 'use-context-selector'
 import { useTranslation } from 'react-i18next'
 import { useStore as useTagStore } from './store'
-import Confirm from '@/app/components/base/confirm'
+import TagRemoveModal from './tag-remove-modal'
 import cn from '@/utils/classnames'
 import type { Tag } from '@/app/components/base/tag-management/constant'
 import { ToastContext } from '@/app/components/base/toast'
@@ -134,15 +134,14 @@ const TagItemEditor: FC<TagItemEditorProps> = ({
           />
         )}
       </div>
-      <Confirm
-        title={`${t('common.tag.delete')} "${tag.name}"`}
-        isShow={showRemoveModal}
-        content={t('common.tag.deleteTip')}
+      <TagRemoveModal
+        tag={tag}
+        show={showRemoveModal}
         onConfirm={() => {
           handleRemove()
           setShowRemoveModal(false)
         }}
-        onCancel={() => setShowRemoveModal(false)}
+        onClose={() => setShowRemoveModal(false)}
       />
     </>
   )

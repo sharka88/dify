@@ -6,28 +6,22 @@ class DeploymentConfig(BaseSettings):
     """
     Deployment configs
     """
-
     APPLICATION_NAME: str = Field(
-        description="application name",
-        default="langgenius/dify",
-    )
-
-    DEBUG: bool = Field(
-        description="whether to enable debug mode.",
-        default=False,
+        description='application name',
+        default='langgenius/dify',
     )
 
     TESTING: bool = Field(
-        description="",
+        description='',
         default=False,
     )
 
     EDITION: str = Field(
-        description="deployment edition",
-        default="SELF_HOSTED",
+        description='deployment edition',
+        default='SELF_HOSTED',
     )
 
     DEPLOY_ENV: str = Field(
-        description="deployment environment, default to PRODUCTION.",
-        default="PRODUCTION",
+        description='deployment environment, default to PRODUCTION.',
+        default='PRODUCTION',
     )

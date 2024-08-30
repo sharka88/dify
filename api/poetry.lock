@@ -1853,6 +1853,40 @@ six = "*"
 xmltodict = "*"
 
 [[package]]
+name = "couchbase"
+version = "4.3.1"
+description = "Python Client for Couchbase"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "couchbase-4.3.1-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:da75bb4438b7a13b598ab78fcbbea450a52f2525b697abd187a699c199d6242b"},
+    {file = "couchbase-4.3.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d63f8c45c522992003d573dd5aa9fa6220bf8f0fc2ea0026dd69ab0071ac6cbf"},
+    {file = "couchbase-4.3.1-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:fb565007a5ce97106b0351f052549664efc5582f4eaba6a4114cacff0b1226fc"},
+    {file = "couchbase-4.3.1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:1037134cec4da70913733d8a9eacfc3cf3ea7de7846cdd982618f9f3ecb9b601"},
+    {file = "couchbase-4.3.1-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:78a2d32f795cada389553a9d42d71f9346e36255e42d4f335c38aefe0b94cb1a"},
+    {file = "couchbase-4.3.1-cp310-cp310-win_amd64.whl", hash = "sha256:f2d960692e66219e4909fb60e10715395bd97256fd733f6812cfd12bc600906d"},
+    {file = "couchbase-4.3.1-cp311-cp311-macosx_10_15_x86_64.whl", hash = "sha256:7fad8da10dce2addc37ea5f644304f3df7c56267b3299318b85842b2a48354e9"},
+    {file = "couchbase-4.3.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:bfa489d31eda3c5fac54f45271d4dccae9401590a3e0b0efc12d0e22ba684cf9"},
+    {file = "couchbase-4.3.1-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:9c57b0eb484924b03d87849aec86af2a96258f6330b1c454a9dac7be4e5fe9ba"},
+    {file = "couchbase-4.3.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:8d1bd713a3e2ec0ecd67ff1b7ef500b1a13591ad0ee6b2686d96d8a4521e9242"},
+    {file = "couchbase-4.3.1-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:0e292990c96001a9990dcc2d41996e50f6d2b568ce0b32c7b2bfc81299ec3a4a"},
+    {file = "couchbase-4.3.1-cp311-cp311-win_amd64.whl", hash = "sha256:b3e0847de283860cc3afe6cbf6903298312ee7749b4db7cf2ce44caf5f73b567"},
+    {file = "couchbase-4.3.1-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:795f34b3e2f5eee906de67106ab908845e5d0a1a43b6f16bea2d4d92e04bc24f"},
+    {file = "couchbase-4.3.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:49c0ef7372714680b7662db72ba90b5d73fae84a4a93bc3a45ed5a258f1547b2"},
+    {file = "couchbase-4.3.1-cp38-cp38-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:a1179b9ecd869dc74c18e352d6589525cffc05c7a4819a5a40b33c744d9ddae1"},
+    {file = "couchbase-4.3.1-cp38-cp38-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:54572b5e3ecf55b39071ab99590378c53741c208af621fc4319dca8560783036"},
+    {file = "couchbase-4.3.1-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:866f3e5843d859d9bc0760e298fa0893f1bfde5f141c4de91fd2874cbc1dff98"},
+    {file = "couchbase-4.3.1-cp38-cp38-win_amd64.whl", hash = "sha256:058103776348a08efc663d57cfa08e902ee3723cc464326bbd9f5bd30b1a13aa"},
+    {file = "couchbase-4.3.1-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:79b3defdd8fb23203a4c77d41df6f64fcc76e88f553aba37f92c2a255e67ff76"},
+    {file = "couchbase-4.3.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:84b73b2d85cb5eef288e5bd9ee60fe973a2ca012d8cc5a66014a2d7a6d471d75"},
+    {file = "couchbase-4.3.1-cp39-cp39-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:825ab48f4a75e140762e06862bc3c23e862acc45905f098d839e75c015ba9bad"},
+    {file = "couchbase-4.3.1-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:7960a2aecc9114fced31af67d9e3a124704a5587a4a918fe056b3e121bafd8ee"},
+    {file = "couchbase-4.3.1-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:91784ab6084a36f27cfc151c37fd61007cd2d22dde6ce5c1ef3aa679bb3bd894"},
+    {file = "couchbase-4.3.1-cp39-cp39-win_amd64.whl", hash = "sha256:1b5edd9ec12a73f21282f8ce159fa84e3633b8143cec66952577ef82ae473888"},
+    {file = "couchbase-4.3.1.tar.gz", hash = "sha256:e5a4b501e252b94e38dfb6366f58040ade3f1bd6a68681a3544653546fcbd2b5"},
+]
+
+[[package]]
 name = "coverage"
 version = "7.2.7"
 description = "Code coverage measurement for Python"
@@ -10063,4 +10097,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "e4c00268514d26bd07c6b72925e0e3b4558ec972895d252e60e9571e3ac38895"
+content-hash = "c5443ac5dc2e1ca15c26828dd85749a2379b6c77e67f7c510b5ebeb46e076ba9"

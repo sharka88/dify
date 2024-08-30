@@ -5,6 +5,7 @@ import queue
 import threading
 import time
 from datetime import timedelta
+from enum import Enum
 from typing import Any, Optional, Union
 from uuid import UUID
 
@@ -23,7 +24,6 @@ from core.ops.entities.trace_entity import (
     ModerationTraceInfo,
     SuggestedQuestionTraceInfo,
     ToolTraceInfo,
-    TraceTaskName,
     WorkflowTraceInfo,
 )
 from core.ops.langfuse_trace.langfuse_trace import LangFuseDataTrace
@@ -38,7 +38,7 @@ provider_config_map = {
     TracingProviderEnum.LANGFUSE.value: {
         'config_class': LangfuseConfig,
         'secret_keys': ['public_key', 'secret_key'],
-        'other_keys': ['host', 'project_key'],
+        'other_keys': ['host'],
         'trace_instance': LangFuseDataTrace
     },
     TracingProviderEnum.LANGSMITH.value: {
@@ -123,6 +123,7 @@ class OpsTraceManager:
 
         for key in other_keys:
             new_config[key] = decrypt_tracing_config.get(key, "")
+
         return config_class(**new_config).model_dump()
 
     @classmethod
@@ -251,18 +252,16 @@ class OpsTraceManager:
         tracing_config = config_type(**tracing_config)
         return trace_instance(tracing_config).api_check()
 
-    @staticmethod
-    def get_trace_config_project_key(tracing_config: dict, tracing_provider: str):
-        """
-        get trace config is project key
-        :param tracing_config: tracing config
-        :param tracing_provider: tracing provider
-        :return:
-        """
-        config_type, trace_instance = provider_config_map[tracing_provider]['config_class'], \
-            provider_config_map[tracing_provider]['trace_instance']
-        tracing_config = config_type(**tracing_config)
-        return trace_instance(tracing_config).get_project_key()
+
+class TraceTaskName(str, Enum):
+    CONVERSATION_TRACE = 'conversation_trace'
+    WORKFLOW_TRACE = 'workflow_trace'
+    MESSAGE_TRACE = 'message_trace'
+    MODERATION_TRACE = 'moderation_trace'
+    SUGGESTED_QUESTION_TRACE = 'suggested_question_trace'
+    DATASET_RETRIEVAL_TRACE = 'dataset_retrieval_trace'
+    TOOL_TRACE = 'tool_trace'
+    GENERATE_NAME_TRACE = 'generate_name_trace'
 
 
 class TraceTask:

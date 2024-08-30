@@ -1,7 +1,6 @@
 import json
 import logging
 from collections.abc import Generator
-from datetime import datetime, timezone
 from typing import Optional, Union
 
 from sqlalchemy import and_
@@ -37,17 +36,17 @@ logger = logging.getLogger(__name__)
 class MessageBasedAppGenerator(BaseAppGenerator):
 
     def _handle_response(
-            self, application_generate_entity: Union[
-                ChatAppGenerateEntity,
-                CompletionAppGenerateEntity,
-                AgentChatAppGenerateEntity,
-                AdvancedChatAppGenerateEntity
-            ],
-            queue_manager: AppQueueManager,
-            conversation: Conversation,
-            message: Message,
-            user: Union[Account, EndUser],
-            stream: bool = False,
+        self, application_generate_entity: Union[
+            ChatAppGenerateEntity,
+            CompletionAppGenerateEntity,
+            AgentChatAppGenerateEntity,
+            AdvancedChatAppGenerateEntity
+        ],
+        queue_manager: AppQueueManager,
+        conversation: Conversation,
+        message: Message,
+        user: Union[Account, EndUser],
+        stream: bool = False,
     ) -> Union[
         ChatbotAppBlockingResponse,
         CompletionAppBlockingResponse,
@@ -139,7 +138,6 @@ class MessageBasedAppGenerator(BaseAppGenerator):
         """
         Initialize generate records
         :param application_generate_entity: application generate entity
-        :conversation conversation
         :return:
         """
         app_config = application_generate_entity.app_config
@@ -194,9 +192,6 @@ class MessageBasedAppGenerator(BaseAppGenerator):
             db.session.add(conversation)
             db.session.commit()
             db.session.refresh(conversation)
-        else:
-            conversation.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
-            db.session.commit()
 
         message = Message(
             app_id=app_config.app_id,
@@ -263,7 +258,7 @@ class MessageBasedAppGenerator(BaseAppGenerator):
 
         return introduction
 
-    def _get_conversation(self, conversation_id: str):
+    def _get_conversation(self, conversation_id: str) -> Conversation:
         """
         Get conversation by conversation id
         :param conversation_id: conversation id
@@ -274,9 +269,6 @@ class MessageBasedAppGenerator(BaseAppGenerator):
             .filter(Conversation.id == conversation_id)
             .first()
         )
-
-        if not conversation:
-            raise ConversationNotExistsError()
 
         return conversation
 

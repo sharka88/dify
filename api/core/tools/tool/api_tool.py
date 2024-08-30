@@ -144,7 +144,7 @@ class ApiTool(Tool):
                 path_params[parameter['name']] = value
 
             elif parameter['in'] == 'query':
-                if value !='': params[parameter['name']] = value
+                params[parameter['name']] = value
 
             elif parameter['in'] == 'cookie':
                 cookies[parameter['name']] = value

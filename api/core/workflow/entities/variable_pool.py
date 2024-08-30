@@ -6,23 +6,21 @@ from typing_extensions import deprecated
 
 from core.app.segments import Segment, Variable, factory
 from core.file.file_obj import FileVar
-from core.workflow.enums import SystemVariableKey
+from core.workflow.entities.node_entities import SystemVariable
 
 VariableValue = Union[str, int, float, dict, list, FileVar]
 
 
-SYSTEM_VARIABLE_NODE_ID = "sys"
-ENVIRONMENT_VARIABLE_NODE_ID = "env"
-CONVERSATION_VARIABLE_NODE_ID = "conversation"
+SYSTEM_VARIABLE_NODE_ID = 'sys'
+ENVIRONMENT_VARIABLE_NODE_ID = 'env'
 
 
 class VariablePool:
     def __init__(
         self,
-        system_variables: Mapping[SystemVariableKey, Any],
+        system_variables: Mapping[SystemVariable, Any],
         user_inputs: Mapping[str, Any],
         environment_variables: Sequence[Variable],
-        conversation_variables: Sequence[Variable] | None = None,
     ) -> None:
         # system variables
         # for example:
@@ -46,12 +44,8 @@ class VariablePool:
             self.add((SYSTEM_VARIABLE_NODE_ID, key.value), value)
 
         # Add environment variables to the variable pool
-        for var in environment_variables:
+        for var in environment_variables or []:
             self.add((ENVIRONMENT_VARIABLE_NODE_ID, var.name), var)
-
-        # Add conversation variables to the variable pool
-        for var in conversation_variables or []:
-            self.add((CONVERSATION_VARIABLE_NODE_ID, var.name), var)
 
     def add(self, selector: Sequence[str], value: Any, /) -> None:
         """
@@ -68,7 +62,7 @@ class VariablePool:
             None
         """
         if len(selector) < 2:
-            raise ValueError("Invalid selector")
+            raise ValueError('Invalid selector')
 
         if value is None:
             return
@@ -95,13 +89,13 @@ class VariablePool:
             ValueError: If the selector is invalid.
         """
         if len(selector) < 2:
-            raise ValueError("Invalid selector")
+            raise ValueError('Invalid selector')
         hash_key = hash(tuple(selector[1:]))
         value = self._variable_dictionary[selector[0]].get(hash_key)
 
         return value
 
-    @deprecated("This method is deprecated, use `get` instead.")
+    @deprecated('This method is deprecated, use `get` instead.')
     def get_any(self, selector: Sequence[str], /) -> Any | None:
         """
         Retrieves the value from the variable pool based on the given selector.
@@ -116,7 +110,7 @@ class VariablePool:
             ValueError: If the selector is invalid.
         """
         if len(selector) < 2:
-            raise ValueError("Invalid selector")
+            raise ValueError('Invalid selector')
         hash_key = hash(tuple(selector[1:]))
         value = self._variable_dictionary[selector[0]].get(hash_key)
         return value.to_object() if value else None

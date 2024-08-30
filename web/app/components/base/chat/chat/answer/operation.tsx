@@ -17,7 +17,7 @@ import {
   ThumbsDown,
   ThumbsUp,
 } from '@/app/components/base/icons/src/vender/line/alertsAndFeedback'
-import Tooltip from '@/app/components/base/tooltip'
+import TooltipPlus from '@/app/components/base/tooltip-plus'
 import Log from '@/app/components/base/chat/chat/log'
 
 type OperationProps = {
@@ -162,34 +162,28 @@ const Operation: FC<OperationProps> = ({
         {
           config?.supportFeedback && !localFeedback?.rating && onFeedback && !isOpeningStatement && (
             <div className='hidden group-hover:flex ml-1 shrink-0 items-center px-0.5 bg-white border-[0.5px] border-gray-100 shadow-md text-gray-500 rounded-lg'>
-              <Tooltip
-                popupContent={t('appDebug.operation.agree')}
-              >
+              <TooltipPlus popupContent={t('appDebug.operation.agree')}>
                 <div
                   className='flex items-center justify-center mr-0.5 w-6 h-6 rounded-md hover:bg-black/5 hover:text-gray-800 cursor-pointer'
                   onClick={() => handleFeedback('like')}
                 >
                   <ThumbsUp className='w-4 h-4' />
                 </div>
-              </Tooltip>
-              <Tooltip
-                popupContent={t('appDebug.operation.disagree')}
-              >
+              </TooltipPlus>
+              <TooltipPlus popupContent={t('appDebug.operation.disagree')}>
                 <div
                   className='flex items-center justify-center w-6 h-6 rounded-md hover:bg-black/5 hover:text-gray-800 cursor-pointer'
                   onClick={() => handleFeedback('dislike')}
                 >
                   <ThumbsDown className='w-4 h-4' />
                 </div>
-              </Tooltip>
+              </TooltipPlus>
             </div>
           )
         }
         {
           config?.supportFeedback && localFeedback?.rating && onFeedback && !isOpeningStatement && (
-            <Tooltip
-              popupContent={localFeedback.rating === 'like' ? t('appDebug.operation.cancelAgree') : t('appDebug.operation.cancelDisagree')}
-            >
+            <TooltipPlus popupContent={localFeedback.rating === 'like' ? t('appDebug.operation.cancelAgree') : t('appDebug.operation.cancelDisagree')}>
               <div
                 className={`
                   flex items-center justify-center w-7 h-7 rounded-[10px] border-[2px] border-white cursor-pointer
@@ -209,7 +203,7 @@ const Operation: FC<OperationProps> = ({
                   )
                 }
               </div>
-            </Tooltip>
+            </TooltipPlus>
           )
         }
       </div>

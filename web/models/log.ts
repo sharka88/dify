@@ -4,7 +4,6 @@ import type {
   Edge,
   Node,
 } from '@/app/components/workflow/types'
-import type { Metadata } from '@/app/components/base/chat/chat/type'
 
 // Log type contains key:string conversation_id:string created_at:string quesiton:string answer:string
 export type Conversation = {
@@ -103,7 +102,6 @@ export type MessageContent = {
     from_end_user_id?: string
   }>
   message_files: VisionFile[]
-  metadata: Metadata
   agent_thoughts: any[] // TODO
   workflow_run_id: string
 }
@@ -117,7 +115,6 @@ export type CompletionConversationGeneralDetail = {
   from_account_id: string
   read_at: Date
   created_at: number
-  updated_at: number
   annotation: Annotation
   user_feedback_stats: {
     like: number

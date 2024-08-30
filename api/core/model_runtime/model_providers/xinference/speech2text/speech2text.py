@@ -52,8 +52,7 @@ class XinferenceSpeech2TextModel(Speech2TextModel):
 
             # initialize client
             client = Client(
-                base_url=credentials['server_url'],
-                api_key=credentials.get('api_key'),
+                base_url=credentials['server_url']
             )
 
             xinference_client = client.get_model(model_uid=credentials['model_uid'])

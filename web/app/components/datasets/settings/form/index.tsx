@@ -163,14 +163,12 @@ const Form = () => {
         <div className={labelClass}>
           <div>{t('datasetSettings.form.name')}</div>
         </div>
-        <div className='w-full max-w-[480px]'>
-          <input
-            disabled={!currentDataset?.embedding_available}
-            className={cn(inputClass, !currentDataset?.embedding_available && 'opacity-60', 'h-9')}
-            value={name}
-            onChange={e => setName(e.target.value)}
-          />
-        </div>
+        <input
+          disabled={!currentDataset?.embedding_available}
+          className={cn(inputClass, !currentDataset?.embedding_available && 'opacity-60', 'h-9')}
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
       </div>
       <div className={rowClass}>
         <div className={labelClass}>

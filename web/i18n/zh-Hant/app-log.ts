@@ -4,9 +4,8 @@ const translation = {
   dateTimeFormat: 'YYYY-MM-DD HH:mm',
   table: {
     header: {
-      updatedTime: '更新時間',
-      time: '創建時間',
-      endUser: '使用者或賬戶',
+      time: '時間',
+      endUser: '使用者',
       input: '輸入',
       output: '輸出',
       summary: '標題',
@@ -17,7 +16,7 @@ const translation = {
       status: '狀態',
       runtime: '執行時間',
       tokens: 'TOKENS',
-      user: '使用者或賬戶',
+      user: '使用者',
       version: '版本',
     },
     pagination: {
@@ -70,9 +69,6 @@ const translation = {
       annotated: '已標註改進（{{count}} 項）',
       not_annotated: '未標註',
     },
-    sortBy: '排序方式：',
-    descending: '降序',
-    ascending: '升序',
   },
   workflowTitle: '日誌',
   workflowSubtitle: '日誌記錄了應用的執行情況',

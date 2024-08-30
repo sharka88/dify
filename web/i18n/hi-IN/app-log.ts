@@ -4,9 +4,8 @@ const translation = {
   dateTimeFormat: 'MM/DD/YYYY hh:mm A',
   table: {
     header: {
-      updatedTime: 'अपडेट का समय',
-      time: 'बनाने का समय',
-      endUser: 'अंतिम उपयोगकर्ता या खाता',
+      time: 'समय',
+      endUser: 'अंतिम उपयोगकर्ता',
       input: 'इनपुट',
       output: 'आउटपुट',
       summary: 'शीर्षक',
@@ -17,7 +16,7 @@ const translation = {
       status: 'स्थिति',
       runtime: 'रन टाइम',
       tokens: 'टोकन',
-      user: 'अंतिम उपयोगकर्ता या खाता',
+      user: 'अंतिम उपयोगकर्ता',
       version: 'संस्करण',
     },
     pagination: {
@@ -72,9 +71,6 @@ const translation = {
       annotated: 'एनोटेट किए गए सुधार ({{count}} आइटम)',
       not_annotated: 'एनोटेट नहीं किया गया',
     },
-    sortBy: 'इसके अनुसार क्रमबद्ध करें:',
-    descending: 'अवरोही',
-    ascending: 'आरोही',
   },
   workflowTitle: 'वर्कफ़्लो लॉग्स',
   workflowSubtitle: 'यह लॉग ऑटोमेटे के ऑपरेशन को रिकॉर्ड करता है।',

@@ -12,6 +12,7 @@ import {
 import { setAutoFreeze } from 'immer'
 import {
   useEventListener,
+  useKeyPress,
 } from 'ahooks'
 import ReactFlow, {
   Background,
@@ -33,9 +34,6 @@ import type {
   EnvironmentVariable,
   Node,
 } from './types'
-import {
-  ControlMode,
-} from './types'
 import { WorkflowContextProvider } from './context'
 import {
   useDSL,
@@ -45,10 +43,10 @@ import {
   useNodesSyncDraft,
   usePanelInteractions,
   useSelectionInteractions,
-  useShortcuts,
   useWorkflow,
   useWorkflowInit,
   useWorkflowReadOnly,
+  useWorkflowStartRun,
   useWorkflowUpdate,
 } from './hooks'
 import Header from './header'
@@ -72,8 +70,10 @@ import {
   useWorkflowStore,
 } from './store'
 import {
+  getKeyboardKeyCodeBySystem,
   initialEdges,
   initialNodes,
+  isEventTargetInputArea,
 } from './utils'
 import {
   CUSTOM_NODE,
@@ -81,7 +81,7 @@ import {
   ITERATION_CHILDREN_Z_INDEX,
   WORKFLOW_DATA_UPDATE,
 } from './constants'
-import { WorkflowHistoryProvider } from './workflow-history-store'
+import { WorkflowHistoryProvider, useWorkflowHistoryStore } from './workflow-history-store'
 import Loading from '@/app/components/base/loading'
 import { FeaturesProvider } from '@/app/components/base/features'
 import type { Features as FeaturesData } from '@/app/components/base/features/types'
@@ -225,12 +225,17 @@ const Workflow: FC<WorkflowProps> = memo(({
     handleNodeConnectStart,
     handleNodeConnectEnd,
     handleNodeContextMenu,
+    handleNodesCopy,
+    handleNodesPaste,
+    handleNodesDuplicate,
+    handleNodesDelete,
     handleHistoryBack,
     handleHistoryForward,
   } = useNodesInteractions()
   const {
     handleEdgeEnter,
     handleEdgeLeave,
+    handleEdgeDelete,
     handleEdgesChange,
   } = useEdgesInteractions()
   const {
@@ -245,6 +250,7 @@ const Workflow: FC<WorkflowProps> = memo(({
   const {
     isValidConnection,
   } = useWorkflow()
+  const { handleStartWorkflowRun } = useWorkflowStartRun()
   const {
     exportCheck,
     handleExportDSL,
@@ -256,7 +262,36 @@ const Workflow: FC<WorkflowProps> = memo(({
     },
   })
 
-  useShortcuts()
+  const { shortcutsEnabled: workflowHistoryShortcutsEnabled } = useWorkflowHistoryStore()
+
+  useKeyPress(['delete', 'backspace'], handleNodesDelete)
+  useKeyPress(['delete', 'backspace'], handleEdgeDelete)
+  useKeyPress(`${getKeyboardKeyCodeBySystem('ctrl')}.c`, (e) => {
+    if (isEventTargetInputArea(e.target as HTMLElement))
+      return
+
+    handleNodesCopy()
+  }, { exactMatch: true, useCapture: true })
+  useKeyPress(`${getKeyboardKeyCodeBySystem('ctrl')}.v`, (e) => {
+    if (isEventTargetInputArea(e.target as HTMLElement))
+      return
+
+    handleNodesPaste()
+  }, { exactMatch: true, useCapture: true })
+  useKeyPress(`${getKeyboardKeyCodeBySystem('ctrl')}.d`, handleNodesDuplicate, { exactMatch: true, useCapture: true })
+  useKeyPress(`${getKeyboardKeyCodeBySystem('alt')}.r`, handleStartWorkflowRun, { exactMatch: true, useCapture: true })
+  useKeyPress(`${getKeyboardKeyCodeBySystem('alt')}.r`, handleStartWorkflowRun, { exactMatch: true, useCapture: true })
+  useKeyPress(
+    `${getKeyboardKeyCodeBySystem('ctrl')}.z`,
+    () => workflowHistoryShortcutsEnabled && handleHistoryBack(),
+    { exactMatch: true, useCapture: true },
+  )
+
+  useKeyPress(
+    [`${getKeyboardKeyCodeBySystem('ctrl')}.y`, `${getKeyboardKeyCodeBySystem('ctrl')}.shift.z`],
+    () => workflowHistoryShortcutsEnabled && handleHistoryForward(),
+    { exactMatch: true, useCapture: true },
+  )
 
   const store = useStoreApi()
   if (process.env.NODE_ENV === 'development') {
@@ -348,14 +383,14 @@ const Workflow: FC<WorkflowProps> = memo(({
         nodesConnectable={!nodesReadOnly}
         nodesFocusable={!nodesReadOnly}
         edgesFocusable={!nodesReadOnly}
-        panOnDrag={controlMode === ControlMode.Hand && !workflowReadOnly}
+        panOnDrag={controlMode === 'hand' && !workflowReadOnly}
         zoomOnPinch={!workflowReadOnly}
         zoomOnScroll={!workflowReadOnly}
         zoomOnDoubleClick={!workflowReadOnly}
         isValidConnection={isValidConnection}
         selectionKeyCode={null}
         selectionMode={SelectionMode.Partial}
-        selectionOnDrag={controlMode === ControlMode.Pointer && !workflowReadOnly}
+        selectionOnDrag={controlMode === 'pointer' && !workflowReadOnly}
         minZoom={0.25}
       >
         <Background

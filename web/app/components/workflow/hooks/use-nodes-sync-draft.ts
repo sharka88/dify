@@ -8,9 +8,7 @@ import {
 } from '../store'
 import { BlockEnum } from '../types'
 import { useWorkflowUpdate } from '../hooks'
-import {
-  useNodesReadOnly,
-} from './use-workflow'
+import { useNodesReadOnly } from './use-workflow'
 import { syncWorkflowDraft } from '@/service/workflow'
 import { useFeaturesStore } from '@/app/components/base/features/hooks'
 import { API_PREFIX } from '@/config'
@@ -33,7 +31,6 @@ export const useNodesSyncDraft = () => {
     const [x, y, zoom] = transform
     const {
       appId,
-      conversationVariables,
       environmentVariables,
       syncWorkflowDraftHash,
     } = workflowStore.getState()
@@ -85,7 +82,6 @@ export const useNodesSyncDraft = () => {
             file_upload: features.file,
           },
           environment_variables: environmentVariables,
-          conversation_variables: conversationVariables,
           hash: syncWorkflowDraftHash,
         },
       }

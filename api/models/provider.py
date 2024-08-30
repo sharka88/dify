@@ -1,8 +1,7 @@
 from enum import Enum
 
 from extensions.ext_database import db
-
-from .types import StringUUID
+from models import StringUUID
 
 
 class ProviderType(Enum):

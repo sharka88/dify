@@ -10,8 +10,6 @@ class Document(BaseModel):
 
     page_content: str
 
-    vector: Optional[list[float]] = None
-
     """Arbitrary metadata about the page content (e.g., source, relationships to other
         documents, etc.).
     """

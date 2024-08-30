@@ -24,7 +24,6 @@ import { LeftIndent02 } from '@/app/components/base/icons/src/vender/line/editor
 import { FileText } from '@/app/components/base/icons/src/vender/line/files'
 import WorkflowToolConfigureButton from '@/app/components/tools/workflow-tool/configure-button'
 import type { InputVar } from '@/app/components/workflow/types'
-import { appDefaultIconBackground } from '@/config'
 
 export type AppPublisherProps = {
   disabled?: boolean
@@ -213,8 +212,8 @@ const AppPublisher = ({
                 detailNeedUpdate={!!toolPublished && published}
                 workflowAppId={appDetail?.id}
                 icon={{
-                  content: (appDetail.icon_type === 'image' ? '🤖' : appDetail?.icon) || '🤖',
-                  background: (appDetail.icon_type === 'image' ? appDefaultIconBackground : appDetail?.icon_background) || appDefaultIconBackground,
+                  content: appDetail?.icon,
+                  background: appDetail?.icon_background,
                 }}
                 name={appDetail?.name}
                 description={appDetail?.description}

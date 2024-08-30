@@ -35,9 +35,7 @@ const RunMode = memo(() => {
           'hover:bg-state-accent-hover cursor-pointer',
           isRunning && 'bg-state-accent-hover !cursor-not-allowed',
         )}
-        onClick={() => {
-          handleWorkflowStartRunInWorkflow()
-        }}
+        onClick={() => handleWorkflowStartRunInWorkflow()}
       >
         {
           isRunning

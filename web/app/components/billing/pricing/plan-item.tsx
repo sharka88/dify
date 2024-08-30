@@ -2,11 +2,14 @@
 import type { FC } from 'react'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import {
+  RiQuestionLine,
+} from '@remixicon/react'
 import { useContext } from 'use-context-selector'
 import { Plan } from '../type'
 import { ALL_PLANS, NUM_INFINITE, contactSalesUrl, contractSales, unAvailable } from '../config'
 import Toast from '../../base/toast'
-import Tooltip from '../../base/tooltip'
+import TooltipPlus from '../../base/tooltip-plus'
 import { PlanRange } from './select-plan-range'
 import cn from '@/utils/classnames'
 import { useAppContext } from '@/context/app-context'
@@ -27,11 +30,13 @@ const KeyValue = ({ label, value, tooltip }: { label: string; value: string | nu
       <div className='flex items-center text-gray-500 space-x-1'>
         <div>{label}</div>
         {tooltip && (
-          <Tooltip
+          <TooltipPlus
             popupContent={
               <div className='w-[200px]'>{tooltip}</div>
             }
-          />
+          >
+            <RiQuestionLine className='w-3 h-3 text-gray-400' />
+          </TooltipPlus>
         )}
       </div>
       <div className='mt-0.5 text-gray-900'>{value}</div>
@@ -131,21 +136,25 @@ const PlanItem: FC<Props> = ({
             <div className='mt-3.5 flex items-center space-x-1'>
               <span>+ </span>
               <div>{t('billing.plansCommon.supportItems.llmLoadingBalancing')}</div>
-              <Tooltip
+              <TooltipPlus
                 popupContent={
                   <div className='w-[200px]'>{t('billing.plansCommon.supportItems.llmLoadingBalancingTooltip')}</div>
                 }
-              />
+              >
+                <RiQuestionLine className='w-3 h-3 text-gray-400' />
+              </TooltipPlus>
             </div>
             <div className='mt-3.5 flex items-center space-x-1'>
               <div className='flex items-center'>
                 +
                 <div className='mr-0.5'>&nbsp;{t('billing.plansCommon.supportItems.ragAPIRequest')}</div>
-                <Tooltip
+                <TooltipPlus
                   popupContent={
                     <div className='w-[200px]'>{t('billing.plansCommon.ragAPIRequestTooltip')}</div>
                   }
-                />
+                >
+                  <RiQuestionLine className='w-3 h-3 text-gray-400' />
+                </TooltipPlus>
               </div>
               <div>{comingSoon}</div>
             </div>

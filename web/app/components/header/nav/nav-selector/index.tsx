@@ -16,16 +16,13 @@ import { Route } from '@/app/components/base/icons/src/vender/solid/mapsAndTrave
 import { useAppContext } from '@/context/app-context'
 import { useStore as useAppStore } from '@/app/components/app/store'
 import { FileArrow01, FilePlus01, FilePlus02 } from '@/app/components/base/icons/src/vender/line/files'
-import type { AppIconType } from '@/types/app'
 
 export type NavItem = {
   id: string
   name: string
   link: string
-  icon_type: AppIconType | null
   icon: string
   icon_background: string
-  icon_url: string | null
   mode?: string
 }
 export type INavSelectorProps = {
@@ -85,7 +82,7 @@ const NavSelector = ({ curNav, navs, createText, isApp, onCreate, onLoadmore }: 
                         router.push(nav.link)
                       }} title={nav.name}>
                         <div className='relative w-6 h-6 mr-2 rounded-md'>
-                          <AppIcon size='tiny' iconType={nav.icon_type} icon={nav.icon} background={nav.icon_background} imageUrl={nav.icon_url}/>
+                          <AppIcon size='tiny' icon={nav.icon} background={nav.icon_background} />
                           {!!nav.mode && (
                             <span className={cn(
                               'absolute w-3.5 h-3.5 -bottom-0.5 -right-0.5 p-0.5 bg-white rounded border-[0.5px] border-[rgba(0,0,0,0.02)] shadow-sm',

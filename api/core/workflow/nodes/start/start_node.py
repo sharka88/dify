@@ -1,7 +1,7 @@
 
 from core.workflow.entities.base_node_data_entities import BaseNodeData
 from core.workflow.entities.node_entities import NodeRunResult, NodeType
-from core.workflow.entities.variable_pool import SYSTEM_VARIABLE_NODE_ID, VariablePool
+from core.workflow.entities.variable_pool import VariablePool
 from core.workflow.nodes.base_node import BaseNode
 from core.workflow.nodes.start.entities import StartNodeData
 from models.workflow import WorkflowNodeExecutionStatus
@@ -17,16 +17,16 @@ class StartNode(BaseNode):
         :param variable_pool: variable pool
         :return:
         """
-        node_inputs = dict(variable_pool.user_inputs)
-        system_inputs = variable_pool.system_variables
+        # Get cleaned inputs
+        cleaned_inputs = dict(variable_pool.user_inputs)
 
-        for var in system_inputs:
-            node_inputs[SYSTEM_VARIABLE_NODE_ID + '.' + var] = system_inputs[var]
+        for var in variable_pool.system_variables:
+            cleaned_inputs['sys.' + var.value] = variable_pool.system_variables[var]
 
         return NodeRunResult(
             status=WorkflowNodeExecutionStatus.SUCCEEDED,
-            inputs=node_inputs,
-            outputs=node_inputs
+            inputs=cleaned_inputs,
+            outputs=cleaned_inputs
         )
 
     @classmethod
