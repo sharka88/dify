@@ -57,6 +57,8 @@ class MessageListApi(WebApiResource):
     message_fields = {
         "id": fields.String,
         "conversation_id": fields.String,
+        "is_regenerated": fields.Boolean,
+        "parent_message_id": fields.String,
         "inputs": fields.Raw,
         "query": fields.String,
         "answer": fields.String(attribute="re_sign_file_url_answer"),
@@ -89,7 +91,7 @@ class MessageListApi(WebApiResource):
 
         try:
             return MessageService.pagination_by_first_id(
-                app_model, end_user, args["conversation_id"], args["first_id"], args["limit"]
+                app_model, end_user, args["conversation_id"], args["first_id"], args["limit"], "desc"
             )
         except services.errors.conversation.ConversationNotExistsError:
             raise NotFound("Conversation Not Exists.")

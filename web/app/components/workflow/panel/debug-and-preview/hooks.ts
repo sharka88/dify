@@ -410,6 +410,8 @@ export const useChat = (
   return {
     conversationId: conversationId.current,
     chatList,
+    chatListRef,
+    handleUpdateChatList,
     handleSend,
     handleStop,
     handleRestart,
