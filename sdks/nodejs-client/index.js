@@ -1,4 +1,8 @@
 import axios from "axios";
+import { ReadStream, createReadStream } from "node:fs";
+import { mergeDefaultOptions } from "./utils.js";
+import FormData from "form-data";
+
 export const BASE_URL = "https://api.dify.ai/v1";
 
 export const routes = {
@@ -35,7 +39,7 @@ export const routes = {
     method: "POST",
     url: () => `/chat-messages`,
   },
-  getSuggested:{
+  getSuggested: {
     method: "GET",
     url: (message_id) => `/messages/${message_id}/suggested`,
   },
@@ -72,8 +76,69 @@ export const routes = {
   stopWorkflow: {
     method: "POST",
     url: (task_id) => `/workflows/${task_id}/stop`,
-  }
+  },
 
+  // dataset'
+  createDataset: {
+    method: "POST",
+    url: () => `/datasets`,
+  },
+  listDatasets: {
+    method: "GET",
+    url: () => `/datasets`,
+  },
+  deleteDataset: {
+    method: "DELETE",
+    url: (dataset_id) => `/datasets/${dataset_id}`,
+  },
+  createDocumentByText: {
+    method: "POST",
+    url: (dataset_id) => `/datasets/${dataset_id}/document/create_by_text`,
+  },
+  createDocumentByFile: {
+    method: "POST",
+    url: (dataset_id) => `/datasets/${dataset_id}/document/create_by_file`,
+  },
+  updateDocumentByText: {
+    method: "POST",
+    url: (dataset_id, document_id) =>
+      `/datasets/${dataset_id}/documents/${document_id}/update_by_text`,
+  },
+  updateDocumentByFile: {
+    method: "POST",
+    url: (dataset_id, document_id) =>
+      `/datasets/${dataset_id}/documents/${document_id}/update_by_file`,
+  },
+  getDocumentEmbeddingStatus: {
+    method: "GET",
+    url: (dataset_id, batch) =>
+      `/datasets/${dataset_id}/documents/${batch}/indexing-status`,
+  },
+  deleteDocument: {
+    method: "DELETE",
+    url: (dataset_id, document_id) =>
+      `/datasets/${dataset_id}/documents/${document_id}`,
+  },
+  listDocuments: {
+    method: "GET",
+    url: (dataset_id) => `/datasets/${dataset_id}/documents`,
+  },
+  addDocumentSegment: {
+    method: "POST",
+    url: (dataset_id, document_id) => `/datasets/${dataset_id}/documents/${document_id}/segments`,
+  },
+  getDocumentSegments: {
+    method: "GET",
+    url: (dataset_id, document_id) => `/datasets/${dataset_id}/documents/${document_id}/segments`,
+  },
+  deleteDocumentSegment: {
+    method: "DELETE",
+    url: (dataset_id, document_id, segment_id) => `/datasets/${dataset_id}/documents/${document_id}/segments/${segment_id}`,
+  },
+  updateDocumentSegment: {
+    method: "POST",
+    url: (dataset_id, document_id, segment_id) => `/datasets/${dataset_id}/documents/${document_id}/segments/${segment_id}`,
+  },
 };
 
 export class DifyClient {
@@ -112,6 +177,7 @@ export class DifyClient {
         params,
         headers,
         responseType: "stream",
+        validateStatus: false,
       });
     } else {
       response = await axios({
@@ -121,10 +187,21 @@ export class DifyClient {
         params,
         headers,
         responseType: "json",
+        validateStatus: false,
       });
     }
 
-    return response;
+    if (!response) {
+      throw new Error("No response from server");
+    }
+
+    if (response?.data.code !== undefined && response.data.code !== 200) {
+      throw new Error(
+        `${response.data.status} ${response.data.code}: ${response.data.message}`
+      );
+    }
+
+    return response.data;
   }
 
   messageFeedback(message_id, rating, user) {
@@ -135,7 +212,7 @@ export class DifyClient {
     return this.sendRequest(
       routes.feedback.method,
       routes.feedback.url(message_id),
-      data
+      data,
     );
   }
 
@@ -329,23 +406,22 @@ export class ChatClient extends DifyClient {
       }
     );
   }
-
 }
 
 export class WorkflowClient extends DifyClient {
-  run(inputs,user,stream) {
-    const data = { 
-      inputs, 
+  run(inputs, user, stream) {
+    const data = {
+      inputs,
       response_mode: stream ? "streaming" : "blocking",
-      user 
+      user
     };
-  
+
     return this.sendRequest(
-        routes.runWorkflow.method,
-        routes.runWorkflow.url(),
-        data,
-        null,
-        stream
+      routes.runWorkflow.method,
+      routes.runWorkflow.url(),
+      data,
+      null,
+      stream
     );
   }
 
@@ -356,5 +432,191 @@ export class WorkflowClient extends DifyClient {
       routes.stopWorkflow.url(task_id),
       data
     );
+  }
+}
+
+export class DatasetClient extends DifyClient {
+  async createDataset(name, options) {
+    const { permission } = options ?? {};
+    const data = { name, permission };
+
+    return this.sendRequest(
+      routes.createDataset.method,
+      routes.createDataset.url(),
+      data,
+    );
+  }
+
+  async listDatasets(params) {
+    return this.sendRequest(
+      routes.listDatasets.method,
+      routes.listDatasets.url(),
+      null,
+      params,
+    );
+  }
+
+  async deleteDataset(dataset_id) {
+    return this.sendRequest(
+      routes.deleteDataset.method,
+      routes.deleteDataset.url(dataset_id),
+    );
+  }
+
+  async createDocumentByText(dataset_id, options) {
+    const defaultOptions = {
+      process_rule: {
+        rules: {
+          pre_processing_rules: [],
+          segmentation: {
+            separator: "\n",
+            max_tokens: 1000,
+          }
+        }
+      }
+    }
+
+    return this.sendRequest(
+      routes.createDocumentByText.method,
+      routes.createDocumentByText.url(dataset_id),
+      mergeDefaultOptions(defaultOptions, options),
+    );
+  }
+
+  async createDocumentByFile(dataset_id, options) {
+    if (!options?.file) {
+      throw new Error("No file provided");
+    }
+    let readStream;
+    if (typeof options.file === "string") {
+      readStream = createReadStream(options.file);
+    } else if (options.file instanceof ReadStream) {
+      readStream = options.file;
+    } else {
+      throw new Error("Invalid file provided. Accepts string or ReadStream");
+    }
+    const defaultOptions = {
+      process_rule: {
+        rules: {
+          pre_processing_rules: [],
+          segmentation: {
+            separator: "\n",
+            max_tokens: 1000,
+          }
+        }
+      }
+    }
+    // Make a copy of options without the file property
+    const _options = { ...options };
+    delete _options.file;
+
+    const data = new FormData();
+
+    data.append("file", readStream);
+    data.append("data", JSON.stringify(mergeDefaultOptions(defaultOptions, _options)));
+
+    return this.sendRequest(
+      routes.createDocumentByFile.method,
+      routes.createDocumentByFile.url(dataset_id),
+      data,
+      null,
+      false,
+      data.getHeaders(),
+    )
+  }
+
+  async updateDocumentByText(dataset_id, document_id, options) {
+    return this.sendRequest(
+      routes.updateDocumentByText.method,
+      routes.updateDocumentByText.url(dataset_id, document_id),
+      options,
+    );
+  }
+
+  async updateDocumentByFile(dataset_id, document_id, options) {
+    if (!options?.file) {
+      throw new Error("No file provided");
+    }
+    let readStream;
+    if (typeof options.file === "string") {
+      readStream = createReadStream(options.file);
+    } else if (options.file instanceof ReadStream) {
+      readStream = options.file;
+    } else {
+      throw new Error("Invalid file provided. Accepts string or ReadStream");
+    }
+
+    const data = new FormData();
+    data.append("file", readStream);
+    if (options.name) {
+      data.append("name", options.name);
+    }
+    if (options.process_rule) {
+      data.append("process_rule", JSON.stringify(options.process_rule));
+    }
+
+    return this.sendRequest(
+      routes.updateDocumentByFile.method,
+      routes.updateDocumentByFile.url(dataset_id, document_id),
+      data,
+      null,
+      false,
+      data.getHeaders(),
+    );
+  }
+
+  async getDocumentEmbeddingStatus(dataset_id, batch) {
+    return this.sendRequest(
+      routes.getDocumentEmbeddingStatus.method,
+      routes.getDocumentEmbeddingStatus.url(dataset_id, batch),
+    );
+  }
+
+  async deleteDocument(dataset_id, document_id) {
+    return this.sendRequest(
+      routes.deleteDocument.method,
+      routes.deleteDocument.url(dataset_id, document_id),
+    );
+  }
+
+  async listDocuments(dataset_id, params) {
+    return this.sendRequest(
+      routes.listDocuments.method,
+      routes.listDocuments.url(dataset_id),
+      null,
+      params,
+    );
+  }
+
+  async addDocumentSegment(dataset_id, document_id, options) {
+    return this.sendRequest(
+      routes.addDocumentSegment.method,
+      routes.addDocumentSegment.url(dataset_id, document_id),
+      options,
+    );
+  }
+
+  async getDocumentSegments(dataset_id, document_id, params) {
+    return this.sendRequest(
+      routes.getDocumentSegments.method,
+      routes.getDocumentSegments.url(dataset_id, document_id),
+      null,
+      params,
+    );
+  }
+
+  async deleteDocumentSegment(dataset_id, document_id, segment_id) {
+    return this.sendRequest(
+      routes.deleteDocumentSegment.method,
+      routes.deleteDocumentSegment.url(dataset_id, document_id, segment_id),
+    );
+  }
+
+  async updateDocumentSegment(dataset_id, document_id, segment_id, options) {
+    return this.sendRequest(
+      routes.updateDocumentSegment.method,
+      routes.updateDocumentSegment.url(dataset_id, document_id, segment_id),
+      options,
+    )
   }
 }
